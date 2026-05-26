@@ -1,0 +1,821 @@
+import { useState, useEffect, useRef } from "react";
+
+const AFFILIATE_GETYOURGUIDE = "https://www.getyourguide.com/stockholm-l30/?partner_id=YOUR_ID";
+const AFFILIATE_THEFORK = "https://www.thefork.com/restaurants/stockholm-c415144";
+
+const COLORS = {
+  navy: "#0D1B2A",
+  gold: "#C9A84C",
+  goldLight: "#F0D080",
+  cream: "#F5F0E8",
+  blue: "#1A3A5C",
+  accent: "#E8C547",
+  red: "#C0392B",
+  green: "#27AE60",
+  softWhite: "#FAF8F4",
+  muted: "#8A9BB0",
+};
+
+const HIDDEN_GEMS = [
+  { emoji: "🍺", title: "Södra Bar", desc: "Rooftop bar locals love — stunning city view, zero tourists. Entrance via Mosebacke Torg.", tag: "Nightlife" },
+  { emoji: "☕", title: "Café Saturnus", desc: "Legendary cinnamon buns the size of your face. Best fika in Stockholm. Queue expected — worth it.", tag: "Café" },
+  { emoji: "🌅", title: "Monteliusvägen", desc: "A free cliffside walkway above Södermalm with the best sunset view in the city. Locals' secret.", tag: "View" },
+  { emoji: "🏛️", title: "Hallwylska Museet", desc: "A frozen-in-time Victorian mansion. Free Tuesdays. 90% of tourists walk past it every day.", tag: "Culture" },
+  { emoji: "🛶", title: "Tantolunden Park", desc: "Where Stockholmers actually hang out in summer. Allotment gardens, hammocks, local BBQs.", tag: "Nature" },
+  { emoji: "🌙", title: "Gondolen Restaurant bar", desc: "Suspended over the city at night. Have just a drink at the bar — the view is free.", tag: "Nightlife" },
+  { emoji: "📚", title: "Antikvariat on Hornsgatan", desc: "Hidden second-hand bookshop. Swedish design items and vintage maps for next to nothing.", tag: "Shopping" },
+  { emoji: "🍣", title: "Sushi Yama Söder", desc: "Best value sushi in Stockholm. Locals-only spot tucked behind Medborgarplatsen.", tag: "Food" },
+];
+
+const EMERGENCY_INFO = [
+  { emoji: "🚨", title: "Emergency (Police/Fire/Ambulance)", detail: "Call: 112", color: COLORS.red },
+  { emoji: "🏥", title: "Non-Emergency Medical", detail: "Call: 1177 (health advice line, 24/7, English spoken)", color: "#E67E22" },
+  { emoji: "💊", title: "24hr Pharmacy", detail: "Apoteket CW Scheele — Klarabergsgatan 64, open 24/7", color: COLORS.green },
+  { emoji: "🛂", title: "Lost Passport", detail: "Contact your embassy + nearest police station. Swedish police: 114 14", color: COLORS.blue },
+  { emoji: "📱", title: "Phone Stolen", detail: "Block SIM immediately. In Sweden: call your provider. Then file police report at polisen.se", color: COLORS.navy },
+  { emoji: "🌐", title: "Australian Embassy", detail: "+46 8 613 2900 | Klarabergsviadukten 63", color: COLORS.muted },
+];
+
+const TRANSPORT_TIPS = [
+  { emoji: "🚇", title: "SL Card (Metro/Bus/Tram)", detail: "Buy at Pressbyrån or SL app. Single: 42 SEK. 24hr pass: 175 SEK. Works on all public transport.", tip: "🔑 Tap in AND out at metro. Forgetting to tap out = fine." },
+  { emoji: "✈️", title: "Arlanda Airport → City", detail: "Arlanda Express: 20 min, ~310 SEK. SL bus 583 + train: ~100 SEK, ~60 min. Taxi: 500–650 SEK fixed price.", tip: "💡 Book Arlanda Express online 30% cheaper." },
+  { emoji: "🚕", title: "Taxis & Rideshare", detail: "Bolt and Uber both work in Stockholm. Cheaper than street taxis. Always check price before confirming.", tip: "⚠️ Street taxis can be very expensive. Always agree on price first or use meter." },
+  { emoji: "⛴️", title: "Ferry / Djurgårdslinjen", detail: "Ferry runs from Slussen to Djurgården (museums). SL card valid. Runs every 10–15 min in season.", tip: "🗓️ Check seasonal hours — reduced schedule in winter." },
+  { emoji: "🌙", title: "Night Buses", detail: "Night buses run 1am–5am when metro is closed. Routes start with 'N'. Same SL card works.", tip: "📍 All night buses stop at Slussen — you're in the right place!" },
+  { emoji: "🚲", title: "City Bikes", detail: "City Bikes available April–October. 3-day pass: 165 SEK at citybikes.se. Great for Djurgården loop.", tip: "🗺️ Pick up/drop off at any dock across the city." },
+];
+
+function LoadingDots() {
+  return (
+    <span style={{ display: "inline-flex", gap: 4, alignItems: "center" }}>
+      {[0, 1, 2].map(i => (
+        <span key={i} style={{
+          width: 7, height: 7, borderRadius: "50%",
+          background: COLORS.gold,
+          animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
+          display: "inline-block",
+        }} />
+      ))}
+      <style>{`@keyframes bounce { 0%,80%,100%{transform:scale(0.8);opacity:0.5} 40%{transform:scale(1.2);opacity:1} }`}</style>
+    </span>
+  );
+}
+
+function HomeScreen({ onNav }) {
+  const buttons = [
+    { id: "food", emoji: "🍕", label: "Food & Drinks", sub: "Open right now", color: "#C0392B", bg: "#FEF0EE" },
+    { id: "transport", emoji: "🚇", label: "Getting Around", sub: "Buses, metro, taxis", color: "#1A6B9A", bg: "#EBF5FF" },
+    { id: "todo", emoji: "📍", label: "Things To Do", sub: "Today's best picks", color: "#27AE60", bg: "#EAFAF1" },
+    { id: "emergency", emoji: "🆘", label: "I Need Help", sub: "Pharmacy, police, lost items", color: "#C0392B", bg: "#FEF0EE" },
+    { id: "itinerary", emoji: "🗓️", label: "Build My Day", sub: "Custom itinerary for you", color: "#8E44AD", bg: "#F5EEF8" },
+    { id: "gems", emoji: "💎", label: "Hidden Gems", sub: "Secrets tourists miss", color: "#C9A84C", bg: "#FDFAED" },
+  ];
+
+  const hour = new Date().getHours();
+  const greeting = hour < 5 ? "Still up? 🌙" : hour < 12 ? "Good morning! ☀️" : hour < 18 ? "Good afternoon! 👋" : "Good evening! 🌆";
+
+  return (
+    <div style={{ padding: "0 0 100px" }}>
+      {/* Hero */}
+      <div style={{
+        background: `linear-gradient(160deg, ${COLORS.navy} 0%, ${COLORS.blue} 100%)`,
+        padding: "40px 24px 32px",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          position: "absolute", top: -40, right: -40,
+          width: 200, height: 200,
+          borderRadius: "50%",
+          background: "rgba(201,168,76,0.12)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: -20, left: 20,
+          width: 100, height: 100,
+          borderRadius: "50%",
+          background: "rgba(255,255,255,0.05)",
+        }} />
+        <div style={{ fontSize: 13, color: COLORS.gold, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", marginBottom: 8 }}>
+          🇸🇪 Stockholm Tonight
+        </div>
+        <div style={{ fontSize: 26, fontWeight: 800, color: "#fff", lineHeight: 1.2, marginBottom: 6 }}>
+          {greeting}
+        </div>
+        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.7)", marginBottom: 20 }}>
+          Your free local guide — made by a Stockholm local
+        </div>
+        <button onClick={() => onNav("chat")} style={{
+          background: COLORS.gold,
+          color: COLORS.navy,
+          border: "none",
+          borderRadius: 50,
+          padding: "14px 28px",
+          fontSize: 15,
+          fontWeight: 800,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          boxShadow: "0 4px 20px rgba(201,168,76,0.4)",
+        }}>
+          💬 Ask me anything
+        </button>
+      </div>
+
+      {/* Quick Ask Bar */}
+      <div style={{ padding: "20px 20px 4px" }}>
+        <div style={{ fontSize: 12, color: COLORS.muted, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>
+          Quick Questions
+        </div>
+        <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 8 }}>
+          {["What's open now? 🕐", "Best fika spot? ☕", "How to get to Gamla Stan? 🗺️", "Late night food? 🌙", "Free things to do? 🎯"].map(q => (
+            <button key={q} onClick={() => onNav("chat", q)} style={{
+              background: "#fff",
+              border: `1.5px solid #E8E0D0`,
+              borderRadius: 50,
+              padding: "10px 16px",
+              fontSize: 13,
+              fontWeight: 600,
+              color: COLORS.navy,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              flexShrink: 0,
+            }}>
+              {q}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Grid */}
+      <div style={{ padding: "16px 20px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        {buttons.map(btn => (
+          <button key={btn.id} onClick={() => onNav(btn.id)} style={{
+            background: "#fff",
+            border: "none",
+            borderRadius: 20,
+            padding: "22px 16px",
+            textAlign: "left",
+            cursor: "pointer",
+            boxShadow: "0 2px 16px rgba(0,0,0,0.07)",
+            transition: "transform 0.15s, box-shadow 0.15s",
+            position: "relative",
+            overflow: "hidden",
+          }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,0,0,0.12)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 16px rgba(0,0,0,0.07)"; }}
+          >
+            <div style={{
+              position: "absolute", top: 0, right: 0,
+              width: 60, height: 60,
+              background: btn.bg,
+              borderBottomLeftRadius: 40,
+            }} />
+            <div style={{ fontSize: 32, marginBottom: 10 }}>{btn.emoji}</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: COLORS.navy, marginBottom: 4 }}>{btn.label}</div>
+            <div style={{ fontSize: 12, color: COLORS.muted, fontWeight: 500 }}>{btn.sub}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Surprise Me */}
+      <div style={{ padding: "0 20px 20px" }}>
+        <button onClick={() => {
+          const gems = HIDDEN_GEMS;
+          const pick = gems[Math.floor(Math.random() * gems.length)];
+          alert(`✨ Local Tip!\n\n${pick.emoji} ${pick.title}\n\n${pick.desc}`);
+        }} style={{
+          width: "100%",
+          background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldLight})`,
+          border: "none",
+          borderRadius: 16,
+          padding: "18px",
+          fontSize: 16,
+          fontWeight: 800,
+          color: COLORS.navy,
+          cursor: "pointer",
+          boxShadow: "0 4px 20px rgba(201,168,76,0.3)",
+        }}>
+          ✨ Surprise Me — Give me a local tip!
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ChatScreen({ initialMessage = "" }) {
+  const [messages, setMessages] = useState([
+    {
+      role: "assistant",
+      content: "Hej! 👋 I'm your Stockholm local guide — ask me anything! What's open now, how to get somewhere, what to eat, hidden gems... I'm here 24/7. What do you need?",
+    },
+  ]);
+  const [input, setInput] = useState(initialMessage);
+  const [loading, setLoading] = useState(false);
+  const [listening, setListening] = useState(false);
+  const bottomRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    if (initialMessage) {
+      setInput(initialMessage);
+    }
+  }, [initialMessage]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
+  const sendMessage = async (text) => {
+    const userText = text || input.trim();
+    if (!userText || loading) return;
+    setInput("");
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString("en-SE", { hour: "2-digit", minute: "2-digit" });
+    const dayStr = now.toLocaleDateString("en-SE", { weekday: "long" });
+
+    const newMessages = [...messages, { role: "user", content: userText }];
+    setMessages(newMessages);
+    setLoading(true);
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          system: `You are a warm, knowledgeable local Stockholm guide. You work nights at a hotel near Slussen, Södermalm. Current time: ${timeStr} on ${dayStr}. You know Stockholm deeply — Södermalm, Gamla Stan, Djurgården, Östermalm, Vasastan.
+
+RULES:
+- Always respond in the SAME LANGUAGE the user writes in. If they write Swedish, answer Swedish. French → French. etc.
+- Be warm, friendly, like a local friend — not a robot
+- Give PRACTICAL, SPECIFIC answers (real place names, real tips)
+- Keep answers concise — 3–5 sentences max unless they ask for more
+- Always mention if something might be closed at the current time
+- Use 1–2 relevant emojis naturally
+- For restaurants/bars: mention price range (budget/mid/fancy) and if reservation needed
+- For transport: always include approximate cost and time
+- If you don't know something specific, say "I'd check Google Maps for live hours on this one"
+- Never give generic tourist advice — be specific and local`,
+          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+        }),
+      });
+      const data = await res.json();
+      const reply = data.content?.[0]?.text || "Sorry, I had a connection issue. Try again!";
+      setMessages(prev => [...prev, { role: "assistant", content: reply }]);
+    } catch {
+      setMessages(prev => [...prev, { role: "assistant", content: "Connection issue — try again in a moment! 🔄" }]);
+    }
+    setLoading(false);
+  };
+
+  const startListening = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { alert("Voice input not supported in this browser. Try Chrome!"); return; }
+    const recognition = new SR();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      setInput(transcript);
+      setListening(false);
+    };
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+    recognitionRef.current = recognition;
+    recognition.start();
+    setListening(true);
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 120px)" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 8px" }}>
+        {messages.map((m, i) => (
+          <div key={i} style={{
+            display: "flex",
+            justifyContent: m.role === "user" ? "flex-end" : "flex-start",
+            marginBottom: 14,
+          }}>
+            {m.role === "assistant" && (
+              <div style={{
+                width: 34, height: 34, borderRadius: "50%",
+                background: `linear-gradient(135deg, ${COLORS.navy}, ${COLORS.blue})`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 16, flexShrink: 0, marginRight: 10, marginTop: 2,
+              }}>🇸🇪</div>
+            )}
+            <div style={{
+              maxWidth: "78%",
+              background: m.role === "user"
+                ? `linear-gradient(135deg, ${COLORS.navy}, ${COLORS.blue})`
+                : "#fff",
+              color: m.role === "user" ? "#fff" : COLORS.navy,
+              padding: "13px 16px",
+              borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+              fontSize: 14.5,
+              lineHeight: 1.6,
+              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+              whiteSpace: "pre-wrap",
+            }}>
+              {m.content}
+            </div>
+          </div>
+        ))}
+        {loading && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: "50%",
+              background: `linear-gradient(135deg, ${COLORS.navy}, ${COLORS.blue})`,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
+            }}>🇸🇪</div>
+            <div style={{ background: "#fff", padding: "13px 18px", borderRadius: "18px 18px 18px 4px", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
+              <LoadingDots />
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Suggested quick replies */}
+      <div style={{ padding: "8px 12px 0", display: "flex", gap: 8, overflowX: "auto" }}>
+        {["What's open now?", "Best area for dinner?", "Cheap eats?", "Night bus routes?"].map(q => (
+          <button key={q} onClick={() => sendMessage(q)} style={{
+            background: "#fff", border: `1.5px solid #E0D8C8`,
+            borderRadius: 50, padding: "7px 14px", fontSize: 12, fontWeight: 600,
+            color: COLORS.navy, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+          }}>{q}</button>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div style={{ padding: "12px 16px 20px", display: "flex", gap: 10, alignItems: "flex-end" }}>
+        <button onClick={startListening} style={{
+          width: 48, height: 48, borderRadius: "50%", flexShrink: 0,
+          background: listening ? COLORS.red : "#fff",
+          border: `2px solid ${listening ? COLORS.red : "#E0D8C8"}`,
+          fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+          transition: "all 0.2s",
+        }}>
+          {listening ? "🔴" : "🎤"}
+        </button>
+        <div style={{ flex: 1, position: "relative" }}>
+          <textarea
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+            placeholder="Ask anything... in any language 🌍"
+            rows={1}
+            style={{
+              width: "100%", borderRadius: 24, border: `1.5px solid #E0D8C8`,
+              padding: "13px 50px 13px 18px", fontSize: 14, fontFamily: "inherit",
+              outline: "none", resize: "none", lineHeight: 1.4,
+              boxSizing: "border-box", background: "#fff",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+            }}
+          />
+          <button onClick={() => sendMessage()} style={{
+            position: "absolute", right: 8, bottom: 8,
+            width: 36, height: 36, borderRadius: "50%",
+            background: input.trim() ? `linear-gradient(135deg, ${COLORS.navy}, ${COLORS.blue})` : "#E0D8C8",
+            border: "none", cursor: input.trim() ? "pointer" : "default",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 16, transition: "background 0.2s",
+          }}>
+            ➤
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TransportScreen() {
+  const [open, setOpen] = useState(null);
+  return (
+    <div style={{ padding: "20px 20px 100px" }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: COLORS.navy, marginBottom: 4 }}>Getting Around 🚇</div>
+      <div style={{ fontSize: 14, color: COLORS.muted, marginBottom: 24 }}>Everything you need to move around Stockholm</div>
+      {TRANSPORT_TIPS.map((t, i) => (
+        <div key={i} onClick={() => setOpen(open === i ? null : i)} style={{
+          background: "#fff", borderRadius: 18, padding: "18px 20px",
+          marginBottom: 12, boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+          cursor: "pointer", border: `1.5px solid ${open === i ? COLORS.gold : "transparent"}`,
+          transition: "border 0.2s",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <span style={{ fontSize: 28 }}>{t.emoji}</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: COLORS.navy }}>{t.title}</div>
+              {open !== i && <div style={{ fontSize: 12, color: COLORS.muted, marginTop: 2 }}>Tap to see details</div>}
+            </div>
+            <span style={{ color: COLORS.muted, fontSize: 18 }}>{open === i ? "▲" : "▼"}</span>
+          </div>
+          {open === i && (
+            <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid #F0E8D8` }}>
+              <div style={{ fontSize: 14, color: COLORS.navy, lineHeight: 1.7, marginBottom: 10 }}>{t.detail}</div>
+              <div style={{ background: "#FFFBF0", border: `1px solid #F0D080`, borderRadius: 12, padding: "10px 14px", fontSize: 13, color: "#7A6020" }}>{t.tip}</div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function FoodScreen({ onNav }) {
+  const times = ["Right now", "Breakfast", "Lunch", "Dinner", "Late night 🌙"];
+  const [time, setTime] = useState("Right now");
+  const foodPrompts = {
+    "Right now": "What restaurants and food places are open right now in Stockholm, especially around Södermalm and Slussen? Give me 5 specific options with price range.",
+    "Breakfast": "Best breakfast spots in Stockholm Södermalm area? Give 5 specific places with what makes each special and price range.",
+    "Lunch": "Best lunch spots in central Stockholm with good value? Give 5 specific recommendations.",
+    "Dinner": "Best dinner restaurants in Stockholm for a visitor? Mix of budget, mid-range, and special occasion options. Give 5 specific places.",
+    "Late night 🌙": "What food options are open late at night (after midnight) in Stockholm, especially near Slussen and Södermalm? Be specific.",
+  };
+  return (
+    <div style={{ padding: "20px 20px 100px" }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: COLORS.navy, marginBottom: 4 }}>Food & Drinks 🍕</div>
+      <div style={{ fontSize: 14, color: COLORS.muted, marginBottom: 20 }}>Ask the AI for real recommendations</div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
+        {times.map(t => (
+          <button key={t} onClick={() => setTime(t)} style={{
+            background: time === t ? COLORS.navy : "#fff",
+            color: time === t ? "#fff" : COLORS.navy,
+            border: `1.5px solid ${time === t ? COLORS.navy : "#E0D8C8"}`,
+            borderRadius: 50, padding: "9px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer",
+          }}>{t}</button>
+        ))}
+      </div>
+      <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: COLORS.navy, marginBottom: 8 }}>Ask about: {time}</div>
+        <div style={{ fontSize: 13, color: COLORS.muted, marginBottom: 16, lineHeight: 1.6 }}>The AI will give you real, specific Stockholm recommendations based on right now.</div>
+        <button onClick={() => onNav("chat", foodPrompts[time])} style={{
+          background: `linear-gradient(135deg, ${COLORS.navy}, ${COLORS.blue})`,
+          color: "#fff", border: "none", borderRadius: 50,
+          padding: "14px 24px", fontSize: 14, fontWeight: 700, cursor: "pointer", width: "100%",
+        }}>
+          💬 Get {time} recommendations →
+        </button>
+      </div>
+      <a href={AFFILIATE_THEFORK} target="_blank" rel="noreferrer" style={{
+        display: "block", background: `linear-gradient(135deg, #E74C3C, #C0392B)`,
+        color: "#fff", borderRadius: 16, padding: "16px 20px",
+        textDecoration: "none", marginBottom: 12,
+      }}>
+        <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>🍽️ Reserve a Table in Stockholm</div>
+        <div style={{ fontSize: 12, opacity: 0.85 }}>Browse restaurants and book instantly on TheFork →</div>
+      </a>
+    </div>
+  );
+}
+
+function ToDoScreen({ onNav }) {
+  const hours = ["2 hours", "Half day", "Full day", "Rainy day ☔", "With kids 👨‍👩‍👧", "Free things only 💸"];
+  const [selected, setSelected] = useState("Full day");
+  const prompts = {
+    "2 hours": "I have only 2 hours in Stockholm near Slussen/Södermalm. What's the single best thing to do? Be specific with walking directions and what to see.",
+    "Half day": "I have half a day in Stockholm. Build me a 4-hour itinerary starting from Slussen. Include mix of sights and a café stop.",
+    "Full day": "Build me a perfect full day itinerary in Stockholm starting from Slussen/Södermalm. Include morning, lunch, afternoon, and evening. Specific places, tips, and transport.",
+    "Rainy day ☔": "What are the best indoor things to do in Stockholm on a rainy day? Give me a full rainy day itinerary with museums, cafés, and indoor activities.",
+    "With kids 👨‍👩‍👧": "What's the best full day itinerary in Stockholm with young children? Include kid-friendly museums, parks, food stops. Starting from Södermalm.",
+    "Free things only 💸": "What are the best completely free things to do in Stockholm? Give me a full day itinerary with only free or very cheap activities.",
+  };
+  return (
+    <div style={{ padding: "20px 20px 100px" }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: COLORS.navy, marginBottom: 4 }}>Things To Do 📍</div>
+      <div style={{ fontSize: 14, color: COLORS.muted, marginBottom: 20 }}>Pick your situation and get a real local plan</div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
+        {hours.map(h => (
+          <button key={h} onClick={() => setSelected(h)} style={{
+            background: selected === h ? COLORS.navy : "#fff",
+            color: selected === h ? "#fff" : COLORS.navy,
+            border: `1.5px solid ${selected === h ? COLORS.navy : "#E0D8C8"}`,
+            borderRadius: 50, padding: "9px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer",
+          }}>{h}</button>
+        ))}
+      </div>
+      <button onClick={() => onNav("chat", prompts[selected])} style={{
+        width: "100%", background: `linear-gradient(135deg, ${COLORS.navy}, ${COLORS.blue})`,
+        color: "#fff", border: "none", borderRadius: 16, padding: "18px",
+        fontSize: 15, fontWeight: 700, cursor: "pointer", marginBottom: 20,
+      }}>
+        🗓️ Build my {selected} plan →
+      </button>
+      <a href={AFFILIATE_GETYOURGUIDE} target="_blank" rel="noreferrer" style={{
+        display: "block", background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldLight})`,
+        color: COLORS.navy, borderRadius: 16, padding: "16px 20px",
+        textDecoration: "none",
+      }}>
+        <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>🎟️ Book Stockholm Tours & Activities</div>
+        <div style={{ fontSize: 12, opacity: 0.7 }}>Skip the queue — book top experiences on GetYourGuide →</div>
+      </a>
+    </div>
+  );
+}
+
+function GemsScreen() {
+  const tags = ["All", "Nightlife", "Café", "View", "Culture", "Nature", "Food", "Shopping"];
+  const [tag, setTag] = useState("All");
+  const filtered = tag === "All" ? HIDDEN_GEMS : HIDDEN_GEMS.filter(g => g.tag === tag);
+  return (
+    <div style={{ padding: "20px 20px 100px" }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: COLORS.navy, marginBottom: 4 }}>Hidden Gems 💎</div>
+      <div style={{ fontSize: 14, color: COLORS.muted, marginBottom: 20 }}>Local secrets most tourists never find</div>
+      <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 24, paddingBottom: 4 }}>
+        {tags.map(t => (
+          <button key={t} onClick={() => setTag(t)} style={{
+            background: tag === t ? COLORS.gold : "#fff",
+            color: tag === t ? COLORS.navy : COLORS.navy,
+            border: `1.5px solid ${tag === t ? COLORS.gold : "#E0D8C8"}`,
+            borderRadius: 50, padding: "8px 16px", fontSize: 13, fontWeight: 600,
+            cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+          }}>{t}</button>
+        ))}
+      </div>
+      {filtered.map((g, i) => (
+        <div key={i} style={{
+          background: "#fff", borderRadius: 20, padding: "20px",
+          marginBottom: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+          borderLeft: `4px solid ${COLORS.gold}`,
+        }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+            <span style={{ fontSize: 30, flexShrink: 0 }}>{g.emoji}</span>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                <span style={{ fontSize: 16, fontWeight: 800, color: COLORS.navy }}>{g.title}</span>
+                <span style={{ fontSize: 11, background: "#FFFBF0", color: "#7A6020", border: "1px solid #F0D080", borderRadius: 50, padding: "2px 8px", fontWeight: 600 }}>{g.tag}</span>
+              </div>
+              <div style={{ fontSize: 13.5, color: "#444", lineHeight: 1.6 }}>{g.desc}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EmergencyScreen() {
+  return (
+    <div style={{ padding: "20px 20px 100px" }}>
+      <div style={{ background: `linear-gradient(135deg, ${COLORS.red}, #A93226)`, borderRadius: 20, padding: "20px", marginBottom: 24 }}>
+        <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 4 }}>🆘 Emergency Info</div>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.85)" }}>Sweden's emergency number is <strong>112</strong> — free, 24/7, English spoken</div>
+      </div>
+      {EMERGENCY_INFO.map((e, i) => (
+        <div key={i} style={{
+          background: "#fff", borderRadius: 18, padding: "18px 20px",
+          marginBottom: 12, boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+          borderLeft: `4px solid ${e.color}`,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <span style={{ fontSize: 26 }}>{e.emoji}</span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: COLORS.navy, marginBottom: 3 }}>{e.title}</div>
+              <div style={{ fontSize: 13, color: "#555" }}>{e.detail}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div style={{ background: "#FFFBF0", border: `1px solid #F0D080`, borderRadius: 18, padding: 20, marginTop: 8 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: COLORS.navy, marginBottom: 8 }}>💡 Good to know in Sweden</div>
+        <div style={{ fontSize: 13, color: "#555", lineHeight: 1.8 }}>
+          🏥 Healthcare is excellent and tourists can access emergency care<br />
+          💳 Sweden is nearly cashless — Visa/Mastercard accepted everywhere<br />
+          🚭 Smoking banned inside all public buildings and restaurants<br />
+          🍺 Alcohol only sold in Systembolaget stores (not supermarkets)<br />
+          🌡️ Tap water is safe and delicious everywhere in Sweden
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ItineraryScreen({ onNav }) {
+  const [hours, setHours] = useState("Full day (8hr)");
+  const [vibe, setVibe] = useState([]);
+  const hoursOpts = ["2 hours", "Half day (4hr)", "Full day (8hr)", "Weekend"];
+  const vibeOpts = ["🏛️ Culture & Museums", "🍽️ Food & Cafés", "🌿 Parks & Nature", "🎉 Nightlife", "🛍️ Shopping", "💸 Budget only", "👨‍👩‍👧 Family friendly"];
+
+  const toggleVibe = (v) => setVibe(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]);
+
+  const buildPrompt = () => {
+    const vibeStr = vibe.length ? vibe.join(", ") : "mix of everything";
+    return `Build me a detailed ${hours} Stockholm itinerary. I'm interested in: ${vibeStr}. Starting point: Slussen/Södermalm. Include specific place names, approximate times, transport tips, and one local secret. Format it clearly with time slots.`;
+  };
+
+  return (
+    <div style={{ padding: "20px 20px 100px" }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: COLORS.navy, marginBottom: 4 }}>Build My Day 🗓️</div>
+      <div style={{ fontSize: 14, color: COLORS.muted, marginBottom: 24 }}>Get a custom Stockholm plan just for you</div>
+
+      <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: COLORS.navy, marginBottom: 12 }}>How much time do you have?</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {hoursOpts.map(h => (
+            <button key={h} onClick={() => setHours(h)} style={{
+              background: hours === h ? COLORS.navy : "#F5F0E8",
+              color: hours === h ? "#fff" : COLORS.navy,
+              border: "none", borderRadius: 50, padding: "9px 16px",
+              fontSize: 13, fontWeight: 600, cursor: "pointer",
+            }}>{h}</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ background: "#fff", borderRadius: 20, padding: 20, marginBottom: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: COLORS.navy, marginBottom: 12 }}>What are you into? (pick any)</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {vibeOpts.map(v => (
+            <button key={v} onClick={() => toggleVibe(v)} style={{
+              background: vibe.includes(v) ? COLORS.gold : "#F5F0E8",
+              color: COLORS.navy, border: "none", borderRadius: 50,
+              padding: "9px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer",
+              transition: "background 0.2s",
+            }}>{v}</button>
+          ))}
+        </div>
+      </div>
+
+      <button onClick={() => onNav("chat", buildPrompt())} style={{
+        width: "100%", background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldLight})`,
+        color: COLORS.navy, border: "none", borderRadius: 16,
+        padding: "18px", fontSize: 16, fontWeight: 800, cursor: "pointer",
+        boxShadow: "0 4px 20px rgba(201,168,76,0.3)",
+      }}>
+        ✨ Build my perfect day →
+      </button>
+    </div>
+  );
+}
+
+export default function App() {
+  const [screen, setScreen] = useState("home");
+  const [chatInit, setChatInit] = useState("");
+  const [largeText, setLargeText] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const dismissed = sessionStorage.getItem("email_dismissed");
+      if (!dismissed) setShowEmail(true);
+    }, 90000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const nav = (s, msg = "") => {
+    if (msg) { setChatInit(msg); setScreen("chat"); }
+    else { setScreen(s); if (s !== "chat") setChatInit(""); }
+  };
+
+  const navItems = [
+    { id: "home", emoji: "🏠", label: "Home" },
+    { id: "chat", emoji: "💬", label: "Ask AI" },
+    { id: "transport", emoji: "🚇", label: "Transport" },
+    { id: "gems", emoji: "💎", label: "Gems" },
+    { id: "emergency", emoji: "🆘", label: "Help" },
+  ];
+
+  const screenTitles = {
+    home: null,
+    chat: "Ask Local AI 💬",
+    transport: "Getting Around 🚇",
+    food: "Food & Drinks 🍕",
+    todo: "Things To Do 📍",
+    gems: "Hidden Gems 💎",
+    emergency: "Emergency Help 🆘",
+    itinerary: "Build My Day 🗓️",
+  };
+
+  return (
+    <div style={{
+      fontFamily: "'Segoe UI', system-ui, sans-serif",
+      background: COLORS.softWhite,
+      minHeight: "100vh",
+      maxWidth: 480,
+      margin: "0 auto",
+      fontSize: largeText ? "110%" : "100%",
+      position: "relative",
+    }}>
+      {/* Header */}
+      {screen !== "home" && (
+        <div style={{
+          background: "#fff",
+          padding: "16px 20px",
+          display: "flex",
+          alignItems: "center",
+          gap: 14,
+          borderBottom: "1px solid #F0E8D8",
+          position: "sticky", top: 0, zIndex: 10,
+          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+        }}>
+          <button onClick={() => setScreen("home")} style={{
+            background: "#F5F0E8", border: "none", borderRadius: "50%",
+            width: 38, height: 38, fontSize: 18, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>←</button>
+          <div style={{ fontSize: 16, fontWeight: 800, color: COLORS.navy, flex: 1 }}>
+            {screenTitles[screen]}
+          </div>
+          <button onClick={() => setLargeText(p => !p)} style={{
+            background: largeText ? COLORS.gold : "#F5F0E8",
+            border: "none", borderRadius: 50, padding: "6px 12px",
+            fontSize: 12, fontWeight: 700, cursor: "pointer", color: COLORS.navy,
+          }}>
+            {largeText ? "A-" : "A+"}
+          </button>
+        </div>
+      )}
+
+      {/* Screens */}
+      {screen === "home" && <HomeScreen onNav={nav} />}
+      {screen === "chat" && <ChatScreen key={chatInit} initialMessage={chatInit} />}
+      {screen === "transport" && <TransportScreen />}
+      {screen === "food" && <FoodScreen onNav={nav} />}
+      {screen === "todo" && <ToDoScreen onNav={nav} />}
+      {screen === "gems" && <GemsScreen />}
+      {screen === "emergency" && <EmergencyScreen />}
+      {screen === "itinerary" && <ItineraryScreen onNav={nav} />}
+
+      {/* Bottom Nav */}
+      <div style={{
+        position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
+        width: "100%", maxWidth: 480,
+        background: "#fff",
+        borderTop: "1px solid #F0E8D8",
+        display: "flex",
+        padding: "8px 0 12px",
+        boxShadow: "0 -4px 20px rgba(0,0,0,0.08)",
+        zIndex: 100,
+      }}>
+        {navItems.map(item => (
+          <button key={item.id} onClick={() => nav(item.id)} style={{
+            flex: 1, background: "none", border: "none", cursor: "pointer",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+            padding: "6px 4px",
+          }}>
+            <span style={{
+              fontSize: 22,
+              filter: screen === item.id ? "none" : "grayscale(0.3) opacity(0.6)",
+              transition: "filter 0.15s",
+            }}>{item.emoji}</span>
+            <span style={{
+              fontSize: 10, fontWeight: 700,
+              color: screen === item.id ? COLORS.navy : COLORS.muted,
+              letterSpacing: 0.5,
+            }}>{item.label}</span>
+            {screen === item.id && (
+              <div style={{ width: 20, height: 3, background: COLORS.gold, borderRadius: 2 }} />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Email popup */}
+      {showEmail && !emailSent && (
+        <div style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
+          display: "flex", alignItems: "flex-end", justifyContent: "center",
+          zIndex: 200, padding: "0 0 20px",
+        }}>
+          <div style={{
+            background: "#fff", borderRadius: "24px 24px 16px 16px",
+            padding: 28, maxWidth: 440, width: "calc(100% - 32px)",
+            boxShadow: "0 -4px 40px rgba(0,0,0,0.2)",
+          }}>
+            <div style={{ fontSize: 28, marginBottom: 8 }}>🎁</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: COLORS.navy, marginBottom: 6 }}>Free Stockholm Insider PDF</div>
+            <div style={{ fontSize: 14, color: COLORS.muted, marginBottom: 20, lineHeight: 1.6 }}>
+              Get our free guide: "47 Things Stockholm Hotels Never Tell You" — sent instantly to your email.
+            </div>
+            <input
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Your email address"
+              style={{
+                width: "100%", padding: "14px 18px", borderRadius: 12, boxSizing: "border-box",
+                border: "1.5px solid #E0D8C8", fontSize: 14, marginBottom: 12, outline: "none",
+              }}
+            />
+            <button onClick={() => { if (email) { setEmailSent(true); setShowEmail(false); alert("🎉 Check your inbox! (Connect an email service like Mailchimp to activate this)"); } }} style={{
+              width: "100%", background: `linear-gradient(135deg, ${COLORS.navy}, ${COLORS.blue})`,
+              color: "#fff", border: "none", borderRadius: 12, padding: "15px",
+              fontSize: 15, fontWeight: 700, cursor: "pointer", marginBottom: 10,
+            }}>
+              Send me the free guide →
+            </button>
+            <button onClick={() => { setShowEmail(false); sessionStorage.setItem("email_dismissed", "1"); }} style={{
+              width: "100%", background: "none", border: "none", color: COLORS.muted,
+              fontSize: 13, cursor: "pointer", padding: "8px",
+            }}>
+              No thanks
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
