@@ -31,14 +31,14 @@ const C = {
   red:"#C0392B",green:"#27AE60",cream:"#F5F0E8"
 };
 
-// ── YOUR YOUTUBE VIDEOS ── add your friend's video IDs here
+// ── YOUTUBE VIDEOS by @stockholmwalkthrough ──
 const VIDEOS = [
-  {id:"3nABpGFBSCo",title:"How to use Stockholm Metro",desc:"Step by step guide to riding the Tunnelbana"},
-  {id:"7m_6-QA8gVA",title:"SL Card — How to buy & use",desc:"Everything about Stockholm's transport card"},
-  {id:"X48VuDVv0do",title:"Stockholm City Walk",desc:"Best walking route through the city centre"},
+  {id:"1ccRzQgU1DE",title:"Hilton Slussen & Around",desc:"Walk from Hilton Slussen exploring the best spots nearby — perfect if staying in the area!"},
+  {id:"zvRiwsTeOAA",title:"Stockholm City Walk",desc:"A beautiful walkthrough of Stockholm's most iconic streets and neighbourhoods."},
+  {id:"O9utv3uU5j4",title:"Exploring Stockholm",desc:"Hidden corners and local spots most tourists never find — a must watch before your visit."},
+  {id:"BpJXCrdLovk",title:"Stockholm Quick Tip",desc:"A quick local tip about Stockholm you need to know before you arrive."},
 ];
-// To add your friend's videos: replace the id values above with the YouTube video ID
-// Example: youtube.com/watch?v=ABC123 → the ID is ABC123
+const LINKTREE = "https://linktr.ee/stockholmwalkthrough";
 
 const GEMS = [
   {emoji:"🍺",title:"Södra Bar",desc:"Rooftop bar locals love — stunning city view, zero tourists. Entrance via Mosebacke Torg.",tag:"Nightlife"},
@@ -319,10 +319,18 @@ function VideosScreen(){
         <div style={{fontSize:13,color:C.muted}}>{v.desc}</div>
       </div>
     </div>)}
-    <div style={{background:C.cream,borderRadius:16,padding:16,fontSize:13,color:"#555",lineHeight:1.7}}>
-      📹 Videos by a local Stockholm creator — subscribe for more tips!<br/>
-      <span style={{fontSize:12,color:C.muted}}>More videos added regularly</span>
+    <div style={{background:C.cream,borderRadius:16,padding:16,fontSize:13,color:"#555",lineHeight:1.7,marginBottom:14}}>
+      📹 Videos by <strong>@stockholmwalkthrough</strong> — a local Stockholm creator!<br/>
+      <span style={{fontSize:12,color:C.muted}}>More videos added regularly — subscribe for updates</span>
     </div>
+    <a href="https://www.youtube.com/@stockholmwalkthrough" target="_blank" rel="noreferrer" style={{display:"block",background:"linear-gradient(135deg,#FF0000,#CC0000)",color:"#fff",borderRadius:16,padding:"16px 20px",textDecoration:"none",marginBottom:12,textAlign:"center"}}>
+      <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>▶️ Subscribe on YouTube</div>
+      <div style={{fontSize:12,opacity:0.85}}>@stockholmwalkthrough — more Stockholm videos →</div>
+    </a>
+    <a href={LINKTREE} target="_blank" rel="noreferrer" style={{display:"block",background:"linear-gradient(135deg,#43E97B,#38F9D7)",color:"#1a1a1a",borderRadius:16,padding:"16px 20px",textDecoration:"none",textAlign:"center"}}>
+      <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>🌿 All Links — stockholmwalkthrough</div>
+      <div style={{fontSize:12,opacity:0.7}}>Instagram, TikTok, more videos and resources →</div>
+    </a>
   </div>;
 }
 
