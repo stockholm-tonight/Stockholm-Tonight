@@ -3,21 +3,56 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Stockholm Tonight 🇸🇪</title>
+<title>Stockholm Tonight — Your Free Local Guide 🇸🇪</title>
+<meta name="description" content="Free AI-powered Stockholm guide. Food, transport, hidden gems, itineraries. Works in any language, 24/7."/>
+<meta property="og:title" content="Stockholm Tonight 🇸🇪"/>
+<meta property="og:description" content="Free local Stockholm guide — AI chat, hidden gems, transport, food. Made by a night receptionist at Slussen."/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇸🇪</text></svg>"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#FAF8F4;min-height:100vh}
-#root{max-width:480px;margin:0 auto;position:relative}
-@keyframes bounce{0%,80%,100%{transform:scale(0.8);opacity:0.5}40%{transform:scale(1.2);opacity:1}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.fade-in{animation:fadeIn 0.3s ease forwards}
+body{font-family:'DM Sans',sans-serif;background:#F7F4EF;min-height:100vh;-webkit-font-smoothing:antialiased}
+#root{max-width:430px;margin:0 auto;position:relative;min-height:100vh;background:#F7F4EF;box-shadow:0 0 60px rgba(0,0,0,0.15)}
+
+/* Typography */
+.serif{font-family:'Playfair Display',serif}
+.sans{font-family:'DM Sans',sans-serif}
+
+/* Animations */
+@keyframes bounce{0%,80%,100%{transform:scale(0.7);opacity:0.4}40%{transform:scale(1.1);opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+.fade-up{animation:fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
+
+/* Scrollbar */
 ::-webkit-scrollbar{width:0px}
 textarea:focus,input:focus{outline:none}
-.link-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,0.12)!important}
-.link-card{transition:transform 0.15s,box-shadow 0.15s}
+
+/* Cards */
+.card{background:#fff;border-radius:20px;box-shadow:0 2px 20px rgba(13,27,42,0.07);transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s ease}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(13,27,42,0.13)}
+
+/* Pill buttons */
+.pill{border-radius:100px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all 0.15s ease}
+.pill:active{transform:scale(0.96)}
+
+/* Gold gradient */
+.gold-btn{background:linear-gradient(135deg,#C9A84C,#E8C84A);color:#1a1000;font-weight:700;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s ease;box-shadow:0 4px 20px rgba(201,168,76,0.35)}
+.gold-btn:hover{box-shadow:0 6px 28px rgba(201,168,76,0.5);transform:translateY(-1px)}
+.gold-btn:active{transform:scale(0.97)}
+
+/* Navy gradient */
+.navy-btn{background:linear-gradient(135deg,#0D1B2A,#1A3A5C);color:#fff;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s ease}
+.navy-btn:active{transform:scale(0.97)}
+
+/* Link cards */
+.link-card{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:15px 18px;margin-bottom:10px;text-decoration:none;box-shadow:0 2px 14px rgba(0,0,0,0.06);transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1)}
+.link-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,0.12)}
 </style>
 </head>
 <body>
@@ -25,157 +60,191 @@ textarea:focus,input:focus{outline:none}
 <script type="text/babel">
 const {useState,useEffect,useRef} = React;
 
-const C = {
-  navy:"#0D1B2A",gold:"#C9A84C",goldLight:"#F0D080",
-  blue:"#1A3A5C",softWhite:"#FAF8F4",muted:"#8A9BB0",
-  red:"#C0392B",green:"#27AE60",cream:"#F5F0E8"
-};
-
-// ── YOUTUBE VIDEOS by @stockholmwalkthrough ──
-const VIDEOS = [
-  {id:"1ccRzQgU1DE",title:"Hilton Slussen & Around",desc:"Walk from Hilton Slussen exploring the best spots nearby — perfect if staying in the area!"},
-  {id:"zvRiwsTeOAA",title:"Stockholm City Walk",desc:"A beautiful walkthrough of Stockholm's most iconic streets and neighbourhoods."},
-  {id:"O9utv3uU5j4",title:"Exploring Stockholm",desc:"Hidden corners and local spots most tourists never find — a must watch before your visit."},
-  {id:"BpJXCrdLovk",title:"Stockholm Quick Tip",desc:"A quick local tip about Stockholm you need to know before you arrive."},
-];
 const LINKTREE = "https://linktr.ee/stockholmwalkthrough";
 
 const GEMS = [
-  {emoji:"🍺",title:"Södra Bar",desc:"Rooftop bar locals love — stunning city view, zero tourists. Entrance via Mosebacke Torg.",tag:"Nightlife"},
-  {emoji:"☕",title:"Café Saturnus",desc:"Legendary cinnamon buns the size of your face. Best fika in Stockholm.",tag:"Café"},
-  {emoji:"🌅",title:"Monteliusvägen",desc:"Free cliffside walkway above Södermalm with the best sunset view in the city.",tag:"View"},
-  {emoji:"🏛️",title:"Hallwylska Museet",desc:"Frozen-in-time Victorian mansion. Free Tuesdays. 90% of tourists miss it.",tag:"Culture"},
-  {emoji:"🌿",title:"Tantolunden Park",desc:"Where Stockholmers actually hang out in summer. Allotment gardens, hammocks, local BBQs.",tag:"Nature"},
-  {emoji:"🌙",title:"Gondolen Bar",desc:"Suspended over the city at night. Have just a drink at the bar — the view is free.",tag:"Nightlife"},
-  {emoji:"📚",title:"Antikvariat Hornsgatan",desc:"Hidden second-hand bookshop. Vintage maps and Swedish design items for nothing.",tag:"Shopping"},
-  {emoji:"🍣",title:"Sushi Yama Söder",desc:"Best value sushi in Stockholm. Locals-only spot behind Medborgarplatsen.",tag:"Food"},
+  {emoji:"🍺",title:"Södra Bar",desc:"Rooftop bar with a stunning city view and zero tourists. Enter via Mosebacke Torg — locals' best kept secret.",tag:"Nightlife"},
+  {emoji:"☕",title:"Café Saturnus",desc:"The most legendary cinnamon buns in Stockholm — literally the size of your face. Queue expected, worth every minute.",tag:"Café"},
+  {emoji:"🌅",title:"Monteliusvägen",desc:"A free cliffside walkway above Södermalm. The best sunset view in the entire city. Completely free, always open.",tag:"View"},
+  {emoji:"🏛️",title:"Hallwylska Museet",desc:"A perfectly preserved Victorian mansion frozen in time. Free on Tuesdays. 90% of tourists walk straight past it.",tag:"Culture"},
+  {emoji:"🌿",title:"Tantolunden Park",desc:"Where actual Stockholmers hang out in summer. Allotment gardens, hammocks, local BBQs — no tourists.",tag:"Nature"},
+  {emoji:"🌙",title:"Gondolen Bar",desc:"Suspended dramatically over the city at night. Order just a drink at the bar — the view is completely free.",tag:"Nightlife"},
+  {emoji:"🛍️",title:"Hornstull Market",desc:"Weekend vintage market where locals buy and sell. Amazing finds, street food, very Södermalm.",tag:"Shopping"},
+  {emoji:"🍣",title:"Sushi Yama Söder",desc:"Best value sushi in Stockholm — locals-only spot tucked just behind Medborgarplatsen.",tag:"Food"},
 ];
 
 const TRANSPORT = [
-  {emoji:"🚇",title:"SL Card (Metro/Bus/Tram)",detail:"Buy at Pressbyrån or SL app. Single: 42 SEK. 24hr pass: 175 SEK.",tip:"🔑 Tap in AND out at metro. Forgetting to tap out = fine."},
-  {emoji:"✈️",title:"Arlanda Airport → City",detail:"Arlanda Express: 20 min ~310 SEK. SL bus 583: ~100 SEK ~60 min. Taxi: 500–650 SEK fixed.",tip:"💡 Book Arlanda Express online — 30% cheaper."},
-  {emoji:"🚕",title:"Taxis & Rideshare",detail:"Bolt and Uber both work in Stockholm. Always cheaper than street taxis.",tip:"⚠️ Street taxis can be expensive. Always agree price first."},
-  {emoji:"⛴️",title:"Ferry to Djurgården",detail:"Ferry from Slussen to Djurgården (ABBA Museum, Vasa). SL card valid. Every 10–15 min.",tip:"🗓️ Check seasonal hours — reduced in winter."},
-  {emoji:"🌙",title:"Night Buses",detail:"Run 1am–5am when metro is closed. Routes start with N. Same SL card works.",tip:"📍 All night buses stop at Slussen — perfect location!"},
-  {emoji:"🚲",title:"City Bikes",detail:"April–October. 3-day pass: 165 SEK at citybikes.se. Great for Djurgården loop.",tip:"🗺️ Pick up and drop off at any dock across the city."},
+  {emoji:"🚇",title:"SL Card (Metro/Bus/Tram)",detail:"Buy at Pressbyrån or SL app. Single ticket: 43 SEK. 24hr pass: 180 SEK. 72hr pass: 360 SEK. Works on all public transport including night buses.",tip:"🔑 Always tap both IN and OUT at the metro. Forgetting to tap out will result in a fine."},
+  {emoji:"✈️",title:"Arlanda Airport → City",detail:"Arlanda Express train: 20 min, ~310 SEK one way. SL bus 583 + commuter train: ~100 SEK, ~60 min. Taxi: 500–775 SEK to the airport (fixed price — always confirm before getting in).",tip:"💡 Book Arlanda Express tickets online for up to 30% cheaper. Buy at arlandaexpress.com"},
+  {emoji:"🚕",title:"Taxis & Rideshare",detail:"Bolt and Uber both operate in Stockholm and are almost always cheaper than street taxis. Always check the price estimate before confirming your trip.",tip:"⚠️ Street taxis can charge very high prices. If using one, always confirm the price or insist on the meter before getting in."},
+  {emoji:"⛴️",title:"Ferry to Djurgården",detail:"Ferry departs from Slussen pier to Djurgården (ABBA Museum, Vasa Museum, Skansen). Your SL card is valid. Runs every 10–15 minutes in season.",tip:"🗓️ Ferry runs on seasonal schedule — check sl.se for current timetable. Reduced service in winter."},
+  {emoji:"🌙",title:"Night Buses",detail:"Night buses run 1am–5am when the metro is closed. All routes start with the letter N. Your regular SL card works on all night buses.",tip:"📍 Great news — ALL night bus routes stop at Slussen. You're in exactly the right place!"},
+  {emoji:"🚲",title:"City Bikes",detail:"Available April–October across the city. 3-day pass: 165 SEK at citybikes.se. Perfect for a loop around Djurgården or exploring Södermalm.",tip:"🗺️ Pick up and drop off at any station across the city — they're everywhere."},
 ];
 
 const EMERGENCY = [
-  {emoji:"🚨",title:"Emergency",detail:"Call: 112 — free, 24/7, English spoken",color:C.red},
-  {emoji:"🏥",title:"Non-Emergency Medical",detail:"Call: 1177 — health advice, 24/7, English",color:"#E67E22"},
-  {emoji:"💊",title:"24hr Pharmacy",detail:"Apoteket CW Scheele — Klarabergsgatan 64",color:C.green},
-  {emoji:"🛂",title:"Lost Passport",detail:"Your embassy + Swedish police: 114 14",color:C.blue},
-  {emoji:"📱",title:"Phone Stolen",detail:"Block SIM, then report at polisen.se",color:C.navy},
+  {emoji:"🚨",title:"Emergency — Police/Fire/Ambulance",detail:"Call: 112 — free, available 24/7, English speakers available",color:"#C0392B"},
+  {emoji:"🏥",title:"Non-Emergency Medical",detail:"Call: 1177 — health advice line, 24/7, English spoken. Also at 1177.se",color:"#E67E22"},
+  {emoji:"💊",title:"24hr Pharmacy",detail:"Apoteket CW Scheele — Klarabergsgatan 64. Open 24 hours, 7 days a week.",color:"#27AE60"},
+  {emoji:"🛂",title:"Lost Passport",detail:"Contact your country's embassy first, then Swedish police on 114 14",color:"#1A3A5C"},
+  {emoji:"📱",title:"Phone Stolen",detail:"Block your SIM immediately by calling your provider, then file a report at polisen.se",color:"#0D1B2A"},
 ];
 
-// ── USEFUL LINKS ── edit these or add more
 const LINKS = [
   {
-    category:"🚕 Getting There",
+    category:"🏆 Best for Bookings",
     items:[
-      {name:"Uber Stockholm",desc:"Book a ride instantly",url:"https://www.uber.com/se/en/",color:"#000000",emoji:"⚫"},
-      {name:"Bolt Stockholm",desc:"Cheaper than Uber, same quality",url:"https://bolt.eu/en-se/cities/stockholm/",color:"#34D186",emoji:"🟢"},
-      {name:"Taxi Stockholm",desc:"Official Stockholm taxi",url:"https://www.taxistockholm.se/en/",color:"#FFD700",emoji:"🟡"},
-      {name:"SL Journey Planner",desc:"Plan any public transport route",url:"https://sl.se/en",color:"#005B99",emoji:"🔵"},
+      {name:"GetYourGuide Stockholm",desc:"Book tours & activities — skip the queue, best prices",url:"https://www.getyourguide.com/stockholm-l30/",color:"#FF5533",emoji:"🎯"},
+      {name:"TheFork Stockholm",desc:"Reserve restaurant tables — tracked bookings, earn per guest",url:"https://www.thefork.com/restaurants/stockholm-c415144",color:"#00B551",emoji:"🍴"},
+      {name:"Booking.com Stockholm",desc:"Hotels & accommodation — best prices guaranteed",url:"https://www.booking.com/city/se/stockholm.en-gb.html",color:"#003580",emoji:"🏨"},
     ]
   },
   {
-    category:"🍽️ Food & Restaurants",
+    category:"🚕 Getting Around",
     items:[
-      {name:"TheFork Stockholm",desc:"Book restaurant tables — earn commission",url:"https://www.thefork.com/restaurants/stockholm-c415144",color:"#00B551",emoji:"🍴"},
-      {name:"Foodora Stockholm",desc:"Food delivery to your hotel",url:"https://www.foodora.se/en/city/stockholm",color:"#D70F64",emoji:"🛵"},
-      {name:"Wolt Stockholm",desc:"Fast food delivery",url:"https://wolt.com/en/swe/stockholm",color:"#009DE0",emoji:"💙"},
+      {name:"Uber Stockholm",desc:"Book a ride — reliable and cashless",url:"https://www.uber.com/se/en/",color:"#000",emoji:"⚫"},
+      {name:"Bolt Stockholm",desc:"Often cheaper than Uber — same quality",url:"https://bolt.eu/en-se/cities/stockholm/",color:"#34D186",emoji:"🟢"},
+      {name:"Taxi Stockholm",desc:"Official Stockholm taxi company",url:"https://www.taxistockholm.se/en/",color:"#F0C040",emoji:"🟡"},
+      {name:"SL Journey Planner",desc:"Plan any metro, bus, tram or ferry route",url:"https://sl.se/en",color:"#005B99",emoji:"🔵"},
     ]
   },
   {
-    category:"🎟️ Tours & Activities",
+    category:"🍽️ Food & Delivery",
     items:[
-      {name:"GetYourGuide Stockholm",desc:"Book tours — you earn 8–12% commission",url:"https://www.getyourguide.com/stockholm-l30/",color:"#FF5533",emoji:"🎯"},
-      {name:"Viator Stockholm",desc:"Skip-the-line tickets & tours",url:"https://www.viator.com/Stockholm/d976-ttd",color:"#1A1A2E",emoji:"🎫"},
-      {name:"ABBA Museum",desc:"Book tickets in advance — often sold out",url:"https://www.abbathemuseum.com/en/",color:"#D4AC0D",emoji:"🎤"},
-      {name:"Vasa Museum",desc:"World's best preserved 17th century ship",url:"https://www.vasamuseet.se/en",color:"#8B4513",emoji:"⚓"},
+      {name:"Foodora Stockholm",desc:"Fast food delivery to your hotel",url:"https://www.foodora.se/en/city/stockholm",color:"#D70F64",emoji:"🛵"},
+      {name:"Wolt Stockholm",desc:"Restaurant delivery — great selection",url:"https://wolt.com/en/swe/stockholm",color:"#009DE0",emoji:"💙"},
     ]
   },
   {
-    category:"🛏️ More Stockholm Hotels",
+    category:"🗺️ Official Guides",
     items:[
-      {name:"Booking.com Stockholm",desc:"Find hotels — earn referral commission",url:"https://www.booking.com/city/se/stockholm.en-gb.html",color:"#003580",emoji:"🏨"},
-      {name:"Hostelworld Stockholm",desc:"Budget accommodation options",url:"https://www.hostelworld.com/findabed.php/ChosenCity.Stockholm",color:"#FF6B35",emoji:"🎒"},
+      {name:"Visit Stockholm",desc:"Official tourism site — events & verified info",url:"https://www.visitstockholm.com/en/",color:"#005B99",emoji:"🏙️"},
+      {name:"Thatsup.se",desc:"Sweden's biggest restaurant & bar guide",url:"https://www.thatsup.se/stockholm/",color:"#FF6B35",emoji:"⭐"},
+    ]
+  },
+  {
+    category:"🎟️ Activities & Tickets",
+    items:[
+      {name:"Viator Stockholm",desc:"Skip-the-line tickets and guided tours",url:"https://www.viator.com/Stockholm/d976-ttd",color:"#1A1A2E",emoji:"🎫"},
+      {name:"ABBA Museum",desc:"Book in advance — often sells out",url:"https://www.abbathemuseum.com/en/",color:"#D4AC0D",emoji:"🎤"},
+      {name:"Vasa Museum",desc:"World's best preserved 17th century warship",url:"https://www.vasamuseet.se/en",color:"#8B4513",emoji:"⚓"},
     ]
   },
 ];
 
+const VIDEOS = [
+  {id:"1ccRzQgU1DE",title:"Hilton Slussen & Around",desc:"Walk from Hilton Slussen to the best spots nearby"},
+  {id:"zvRiwsTeOAA",title:"Stockholm City Walk",desc:"Iconic streets and neighbourhoods of Stockholm"},
+  {id:"O9utv3uU5j4",title:"Exploring Stockholm",desc:"Hidden corners most tourists never find"},
+  {id:"BpJXCrdLovk",title:"Stockholm Quick Tip",desc:"Local tip every visitor needs to know"},
+];
+
+// ─── COMPONENTS ───────────────────────────────────────
+
 function Dots(){
-  return <span style={{display:"inline-flex",gap:4,alignItems:"center"}}>
-    {[0,1,2].map(i=><span key={i} style={{width:7,height:7,borderRadius:"50%",background:C.gold,animation:`bounce 1.2s ease ${i*0.2}s infinite`,display:"inline-block"}}/>)}
+  return <span style={{display:"inline-flex",gap:5,alignItems:"center"}}>
+    {[0,1,2].map(i=><span key={i} style={{width:7,height:7,borderRadius:"50%",background:"#C9A84C",animation:`bounce 1.3s ease ${i*0.18}s infinite`,display:"inline-block"}}/>)}
   </span>;
 }
 
+function Logo(){
+  return <div style={{display:"flex",alignItems:"center",gap:8}}>
+    <span style={{fontSize:22}}>🇸🇪</span>
+    <div>
+      <div className="serif" style={{fontSize:17,fontWeight:900,color:"#fff",letterSpacing:"-0.3px",lineHeight:1}}>Stockholm</div>
+      <div style={{fontSize:9,color:"rgba(255,255,255,0.6)",letterSpacing:4,textTransform:"uppercase",fontWeight:600}}>Tonight</div>
+    </div>
+  </div>;
+}
 
-
+// ─── HOME ──────────────────────────────────────────────
 function Home({onNav,location}){
   const h=new Date().getHours();
-  const greeting=h<5?"Still up? 🌙":h<12?"Good morning! ☀️":h<18?"Good afternoon! 👋":"Good evening! 🌆";
+  const greeting=h<5?"Still up? 🌙":h<12?"Good morning ☀️":h<18?"Good afternoon 👋":"Good evening 🌆";
+
   const btns=[
-    {id:"food",emoji:"🍕",label:"Food & Drinks",sub:"Open right now",bg:"#FEF0EE"},
-    {id:"transport",emoji:"🚇",label:"Getting Around",sub:"Buses, metro, taxis",bg:"#EBF5FF"},
-    {id:"todo",emoji:"📍",label:"Things To Do",sub:"Today's best picks",bg:"#EAFAF1"},
-    {id:"emergency",emoji:"🆘",label:"I Need Help",sub:"Pharmacy, police, lost items",bg:"#FEF0EE"},
-    {id:"itinerary",emoji:"🗓️",label:"Build My Day",sub:"Custom itinerary",bg:"#F5EEF8"},
-    {id:"gems",emoji:"💎",label:"Hidden Gems",sub:"Secrets tourists miss",bg:"#FDFAED"},
+    {id:"food",emoji:"🍕",label:"Food & Drinks",sub:"Open right now"},
+    {id:"transport",emoji:"🚇",label:"Getting Around",sub:"Metro, taxi, buses"},
+    {id:"todo",emoji:"📍",label:"Things To Do",sub:"Best picks today"},
+    {id:"emergency",emoji:"🆘",label:"I Need Help",sub:"Pharmacy & police"},
+    {id:"itinerary",emoji:"🗓️",label:"Build My Day",sub:"Custom itinerary"},
+    {id:"gems",emoji:"💎",label:"Hidden Gems",sub:"Locals' secrets"},
   ];
-  return <div style={{paddingBottom:100}}>
-    <div style={{background:`linear-gradient(160deg,${C.navy},${C.blue})`,padding:"40px 24px 32px",position:"relative",overflow:"hidden"}}>
-      <div style={{position:"absolute",top:-40,right:-40,width:200,height:200,borderRadius:"50%",background:"rgba(201,168,76,0.12)"}}/>
-      <div style={{fontSize:12,color:C.gold,fontWeight:700,letterSpacing:3,textTransform:"uppercase",marginBottom:8}}>🇸🇪 Stockholm Tonight</div>
-      <div style={{fontSize:26,fontWeight:800,color:"#fff",lineHeight:1.2,marginBottom:6}}>{greeting}</div>
-      {location&&<div style={{fontSize:13,color:"rgba(255,255,255,0.6)",marginBottom:6}}>📍 {location}</div>}
-      <div style={{fontSize:14,color:"rgba(255,255,255,0.7)",marginBottom:20}}>Your free local guide — made by a Stockholm local</div>
-      <button onClick={()=>onNav("chat")} style={{background:C.gold,color:C.navy,border:"none",borderRadius:50,padding:"14px 28px",fontSize:15,fontWeight:800,cursor:"pointer",boxShadow:"0 4px 20px rgba(201,168,76,0.4)"}}>
-        💬 Ask me anything
+
+  return <div style={{paddingBottom:90}}>
+    {/* Hero */}
+    <div style={{background:"linear-gradient(160deg,#0D1B2A 0%,#1A3A5C 60%,#0D3B2E 100%)",padding:"44px 24px 36px",position:"relative",overflow:"hidden",minHeight:220}}>
+      {/* Decorative circles */}
+      <div style={{position:"absolute",top:-60,right:-60,width:220,height:220,borderRadius:"50%",background:"rgba(201,168,76,0.1)",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",bottom:-40,left:-20,width:160,height:160,borderRadius:"50%",background:"rgba(255,255,255,0.04)",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",top:40,right:30,width:80,height:80,borderRadius:"50%",background:"rgba(201,168,76,0.06)",pointerEvents:"none"}}/>
+
+      <Logo/>
+      <div className="serif fade-up" style={{fontSize:32,fontWeight:900,color:"#fff",lineHeight:1.1,margin:"18px 0 6px",letterSpacing:"-0.5px"}}>
+        {greeting}
+      </div>
+      {location&&<div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:6,fontWeight:500}}>📍 {location}</div>}
+      <div style={{fontSize:14,color:"rgba(255,255,255,0.6)",marginBottom:24,lineHeight:1.5}}>
+        Your free local guide — made by a Stockholm local
+      </div>
+      <button className="gold-btn" onClick={()=>onNav("chat")} style={{borderRadius:50,padding:"14px 28px",fontSize:15,display:"inline-flex",alignItems:"center",gap:8}}>
+        <span>💬</span> Ask me anything
       </button>
     </div>
+
+    {/* Quick questions */}
     <div style={{padding:"20px 20px 4px"}}>
-      <div style={{fontSize:11,color:C.muted,fontWeight:600,letterSpacing:2,textTransform:"uppercase",marginBottom:12}}>Quick Questions</div>
-      <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:8}}>
+      <div style={{fontSize:10,color:"#8A9BB0",fontWeight:700,letterSpacing:3,textTransform:"uppercase",marginBottom:12}}>Quick Questions</div>
+      <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:6}}>
         {["What's open now? 🕐","Best fika? ☕","Gamla Stan? 🗺️","Late night food? 🌙","Free things? 🎯"].map(q=>
-          <button key={q} onClick={()=>onNav("chat",q)} style={{background:"#fff",border:"1.5px solid #E8E0D0",borderRadius:50,padding:"10px 16px",fontSize:13,fontWeight:600,color:C.navy,cursor:"pointer",whiteSpace:"nowrap",boxShadow:"0 2px 8px rgba(0,0,0,0.06)",flexShrink:0}}>{q}</button>
+          <button key={q} onClick={()=>onNav("chat",q)} className="pill" style={{background:"#fff",border:"1.5px solid #EAE4D8",padding:"10px 16px",fontSize:12.5,color:"#0D1B2A",whiteSpace:"nowrap",flexShrink:0,boxShadow:"0 2px 10px rgba(0,0,0,0.06)"}}>{q}</button>
         )}
       </div>
     </div>
-    <div style={{padding:"16px 20px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-      {btns.map(b=><button key={b.id} onClick={()=>onNav(b.id)} style={{background:"#fff",border:"none",borderRadius:20,padding:"22px 16px",textAlign:"left",cursor:"pointer",boxShadow:"0 2px 16px rgba(0,0,0,0.07)",position:"relative",overflow:"hidden"}}>
-        <div style={{position:"absolute",top:0,right:0,width:60,height:60,background:b.bg,borderBottomLeftRadius:40}}/>
-        <div style={{fontSize:30,marginBottom:10}}>{b.emoji}</div>
-        <div style={{fontSize:15,fontWeight:800,color:C.navy,marginBottom:4}}>{b.label}</div>
-        <div style={{fontSize:12,color:C.muted}}>{b.sub}</div>
-      </button>)}
+
+    {/* Main grid */}
+    <div style={{padding:"14px 16px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+      {btns.map((b,i)=>{
+        const accents=["#C0392B","#1A6B9A","#27AE60","#C0392B","#8E44AD","#C9A84C"];
+        return <button key={b.id} onClick={()=>onNav(b.id)} className="card" style={{border:"none",borderRadius:20,padding:"20px 16px",textAlign:"left",cursor:"pointer",position:"relative",overflow:"hidden",borderTop:`3px solid ${accents[i]}`}}>
+          <div style={{fontSize:28,marginBottom:10}}>{b.emoji}</div>
+          <div style={{fontSize:14,fontWeight:700,color:"#0D1B2A",marginBottom:3,lineHeight:1.2}}>{b.label}</div>
+          <div style={{fontSize:11.5,color:"#8A9BB0",fontWeight:500}}>{b.sub}</div>
+        </button>;
+      })}
     </div>
-    {/* Useful Links Button */}
-    <div style={{padding:"0 20px 12px"}}>
-      <button onClick={()=>onNav("links")} style={{width:"100%",background:"#fff",border:`2px solid ${C.gold}`,borderRadius:16,padding:18,fontSize:15,fontWeight:700,color:C.navy,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
+
+    {/* Action buttons */}
+    <div style={{padding:"4px 16px 0",display:"flex",flexDirection:"column",gap:10}}>
+      <button onClick={()=>onNav("links")} style={{width:"100%",background:"#fff",border:"2px solid #C9A84C",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:"#0D1B2A",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(201,168,76,0.15)"}}>
         🔗 Useful Stockholm Links & Apps
       </button>
-    </div>
-    {/* Videos Button */}
-    <div style={{padding:"0 20px 12px"}}>
-      <button onClick={()=>onNav("videos")} style={{width:"100%",background:"#fff",border:`2px solid #FF0000`,borderRadius:16,padding:18,fontSize:15,fontWeight:700,color:C.navy,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
+      <button onClick={()=>onNav("videos")} style={{width:"100%",background:"#fff",border:"2px solid #FF0000",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:"#0D1B2A",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(255,0,0,0.08)"}}>
         ▶️ Stockholm Video Guides
       </button>
+      <button onClick={()=>{const g=GEMS[Math.floor(Math.random()*GEMS.length)];alert(`✨ Local Tip!\n\n${g.emoji} ${g.title}\n\n${g.desc}`);}} className="gold-btn" style={{width:"100%",borderRadius:16,padding:"17px",fontSize:15,fontWeight:800}}>
+        ✨ Surprise Me — Local Secret!
+      </button>
     </div>
-    <div style={{padding:"0 20px 20px"}}>
-      <button onClick={()=>{const g=GEMS[Math.floor(Math.random()*GEMS.length)];alert(`✨ Local Tip!\n\n${g.emoji} ${g.title}\n\n${g.desc}`);}} style={{width:"100%",background:`linear-gradient(135deg,${C.gold},${C.goldLight})`,border:"none",borderRadius:16,padding:18,fontSize:16,fontWeight:800,color:C.navy,cursor:"pointer",boxShadow:"0 4px 20px rgba(201,168,76,0.3)"}}>
-        ✨ Surprise Me — Give me a local tip!
+
+    {/* Share button */}
+    <div style={{padding:"12px 16px 0",textAlign:"center"}}>
+      <button onClick={()=>{if(navigator.share){navigator.share({title:"Stockholm Tonight",text:"Free local Stockholm guide — AI chat, hidden gems, transport 🇸🇪",url:window.location.href});}else{navigator.clipboard.writeText(window.location.href);alert("Link copied! Share it with your travel companions 🇸🇪");}}} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"#8A9BB0",fontWeight:600,padding:"8px 16px",borderRadius:50,transition:"color 0.2s"}}
+        onMouseEnter={e=>e.target.style.color="#0D1B2A"}
+        onMouseLeave={e=>e.target.style.color="#8A9BB0"}>
+        📤 Share this guide with a friend
       </button>
     </div>
   </div>;
 }
 
+// ─── CHAT ─────────────────────────────────────────────
 function Chat({initMsg="",location}){
-  const [msgs,setMsgs]=useState([{role:"assistant",content:"Hej! 👋 I'm your Stockholm local guide — ask me anything in any language! Food, transport, hidden gems, what's open now... I'm here 24/7!"}]);
+  const [msgs,setMsgs]=useState([{role:"assistant",content:"Hej! 👋 I'm your Stockholm local guide — ask me anything in any language!\n\nFood, transport, hidden gems, what to do... I'm honest about what I know and what I don't. What do you need?"}]);
   const [input,setInput]=useState(initMsg);
   const [loading,setLoading]=useState(false);
   const bottomRef=useRef(null);
+  const taRef=useRef(null);
 
   useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"});},[msgs,loading]);
 
@@ -183,10 +252,7 @@ function Chat({initMsg="",location}){
     const text=txt||input.trim();
     if(!text||loading)return;
     setInput("");
-    const now=new Date();
-    const time=now.toLocaleTimeString("en-SE",{hour:"2-digit",minute:"2-digit"});
-    const day=now.toLocaleDateString("en-SE",{weekday:"long"});
-    const locStr=location?`User's current location: ${location}.`:"User is near Slussen, Södermalm.";
+    const locStr=location?`User location: ${location}`:"Near Slussen, Södermalm";
     const newMsgs=[...msgs,{role:"user",content:text}];
     setMsgs(newMsgs);
     setLoading(true);
@@ -194,19 +260,15 @@ function Chat({initMsg="",location}){
       const res=await fetch("/.netlify/functions/chat",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          messages:newMsgs.map(m=>({role:m.role,content:m.content})),
-          location:locStr
-        })
+        body:JSON.stringify({messages:newMsgs.map(m=>({role:m.role,content:m.content})),location:locStr})
       });
       const data=await res.json();
       if(data.error){
-        setMsgs(p=>[...p,{role:"assistant",content:`⚠️ API Error: ${data.error.message}. Please check your API key in settings.`}]);
+        setMsgs(p=>[...p,{role:"assistant",content:`⚠️ ${data.error.message||"Something went wrong. Please try again."}`}]);
       } else {
-        const reply=data.content?.[0]?.text||"Sorry, connection issue. Try again!";
-        setMsgs(p=>[...p,{role:"assistant",content:reply}]);
+        setMsgs(p=>[...p,{role:"assistant",content:data.content?.[0]?.text||"Sorry, try again!"}]);
       }
-    }catch(e){
+    }catch{
       setMsgs(p=>[...p,{role:"assistant",content:"Connection issue — check your internet and try again! 🔄"}]);
     }
     setLoading(false);
@@ -220,209 +282,244 @@ function Chat({initMsg="",location}){
     r.start();
   };
 
-  return <div style={{display:"flex",flexDirection:"column",height:"calc(100vh - 120px)"}}>
-    <div style={{flex:1,overflowY:"auto",padding:"16px 16px 8px"}}>
-      {msgs.map((m,i)=><div key={i} className="fade-in" style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",marginBottom:14}}>
-        {m.role==="assistant"&&<div style={{width:34,height:34,borderRadius:"50%",background:`linear-gradient(135deg,${C.navy},${C.blue})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0,marginRight:10,marginTop:2}}>🇸🇪</div>}
-        <div style={{maxWidth:"78%",background:m.role==="user"?`linear-gradient(135deg,${C.navy},${C.blue})`:"#fff",color:m.role==="user"?"#fff":C.navy,padding:"13px 16px",borderRadius:m.role==="user"?"18px 18px 4px 18px":"18px 18px 18px 4px",fontSize:14.5,lineHeight:1.6,boxShadow:"0 2px 12px rgba(0,0,0,0.08)",whiteSpace:"pre-wrap"}}>{m.content}</div>
+  return <div style={{display:"flex",flexDirection:"column",height:"calc(100vh - 112px)"}}>
+    <div style={{flex:1,overflowY:"auto",padding:"16px 14px 8px"}}>
+      {msgs.map((m,i)=><div key={i} className="fade-up" style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",marginBottom:14,gap:10}}>
+        {m.role==="assistant"&&<div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#0D1B2A,#1A3A5C)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0,marginTop:2,boxShadow:"0 2px 10px rgba(13,27,42,0.25)"}}>🇸🇪</div>}
+        <div style={{maxWidth:"76%",background:m.role==="user"?"linear-gradient(135deg,#0D1B2A,#1A3A5C)":"#fff",color:m.role==="user"?"#fff":"#0D1B2A",padding:"13px 16px",borderRadius:m.role==="user"?"18px 18px 4px 18px":"18px 18px 18px 4px",fontSize:14.5,lineHeight:1.65,boxShadow:"0 2px 16px rgba(0,0,0,0.08)",whiteSpace:"pre-wrap",fontWeight:m.role==="user"?500:400}}>{m.content}</div>
       </div>)}
       {loading&&<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-        <div style={{width:34,height:34,borderRadius:"50%",background:`linear-gradient(135deg,${C.navy},${C.blue})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>🇸🇪</div>
-        <div style={{background:"#fff",padding:"13px 18px",borderRadius:"18px 18px 18px 4px",boxShadow:"0 2px 12px rgba(0,0,0,0.08)"}}><Dots/></div>
+        <div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#0D1B2A,#1A3A5C)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,boxShadow:"0 2px 10px rgba(13,27,42,0.25)"}}>🇸🇪</div>
+        <div style={{background:"#fff",padding:"14px 20px",borderRadius:"18px 18px 18px 4px",boxShadow:"0 2px 16px rgba(0,0,0,0.08)"}}><Dots/></div>
       </div>}
       <div ref={bottomRef}/>
     </div>
-    <div style={{padding:"8px 12px 0",display:"flex",gap:8,overflowX:"auto"}}>
-      {["What's open now?","Best area for dinner?","Night bus routes?","Free museums?"].map(q=>
-        <button key={q} onClick={()=>send(q)} style={{background:"#fff",border:"1.5px solid #E0D8C8",borderRadius:50,padding:"7px 14px",fontSize:12,fontWeight:600,color:C.navy,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>{q}</button>
+
+    {/* Quick replies */}
+    <div style={{padding:"8px 14px 0",display:"flex",gap:8,overflowX:"auto"}}>
+      {["What's open now?","Dinner tonight?","Night bus routes?","Free museums?"].map(q=>
+        <button key={q} onClick={()=>send(q)} className="pill" style={{background:"#fff",border:"1.5px solid #EAE4D8",padding:"7px 14px",fontSize:12,color:"#0D1B2A",whiteSpace:"nowrap",flexShrink:0,boxShadow:"0 1px 8px rgba(0,0,0,0.05)"}}>{q}</button>
       )}
     </div>
-    <div style={{padding:"12px 16px 20px",display:"flex",gap:10,alignItems:"flex-end"}}>
-      <button onClick={mic} style={{width:48,height:48,borderRadius:"50%",flexShrink:0,background:"#fff",border:"2px solid #E0D8C8",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>🎤</button>
+
+    {/* Input */}
+    <div style={{padding:"10px 14px 18px",display:"flex",gap:10,alignItems:"flex-end"}}>
+      <button onClick={mic} style={{width:46,height:46,borderRadius:"50%",flexShrink:0,background:"#fff",border:"1.5px solid #EAE4D8",fontSize:19,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 10px rgba(0,0,0,0.06)"}}>🎤</button>
       <div style={{flex:1,position:"relative"}}>
-        <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}}} placeholder="Ask anything... in any language 🌍" rows={1} style={{width:"100%",borderRadius:24,border:"1.5px solid #E0D8C8",padding:"13px 50px 13px 18px",fontSize:14,fontFamily:"inherit",resize:"none",lineHeight:1.4,boxSizing:"border-box",background:"#fff",boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}/>
-        <button onClick={()=>send()} style={{position:"absolute",right:8,bottom:8,width:36,height:36,borderRadius:"50%",background:input.trim()?`linear-gradient(135deg,${C.navy},${C.blue})`:"#E0D8C8",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>➤</button>
+        <textarea ref={taRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}}} placeholder="Ask anything... in any language 🌍" rows={1} style={{width:"100%",borderRadius:24,border:"1.5px solid #EAE4D8",padding:"13px 50px 13px 18px",fontSize:14,fontFamily:"'DM Sans',sans-serif",resize:"none",lineHeight:1.4,boxSizing:"border-box",background:"#fff",boxShadow:"0 2px 14px rgba(0,0,0,0.07)",color:"#0D1B2A"}}/>
+        <button onClick={()=>send()} style={{position:"absolute",right:7,bottom:7,width:36,height:36,borderRadius:"50%",background:input.trim()?"linear-gradient(135deg,#0D1B2A,#1A3A5C)":"#E8E0D0",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,transition:"background 0.2s"}}>➤</button>
       </div>
     </div>
   </div>;
 }
 
+// ─── TRANSPORT ────────────────────────────────────────
 function Transport(){
   const [open,setOpen]=useState(null);
-  return <div style={{padding:"20px 20px 100px"}}>
-    <div style={{fontSize:22,fontWeight:800,color:C.navy,marginBottom:4}}>Getting Around 🚇</div>
-    <div style={{fontSize:14,color:C.muted,marginBottom:24}}>Everything you need to move around Stockholm</div>
-    {TRANSPORT.map((t,i)=><div key={i} onClick={()=>setOpen(open===i?null:i)} style={{background:"#fff",borderRadius:18,padding:"18px 20px",marginBottom:12,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",cursor:"pointer",border:`1.5px solid ${open===i?C.gold:"transparent"}`}}>
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Getting Around</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:24,fontWeight:500}}>Everything you need to move around Stockholm</div>
+    {TRANSPORT.map((t,i)=><div key={i} onClick={()=>setOpen(open===i?null:i)} className="card" style={{borderRadius:18,padding:"18px 20px",marginBottom:12,cursor:"pointer",border:`1.5px solid ${open===i?"#C9A84C":"transparent"}`}}>
       <div style={{display:"flex",alignItems:"center",gap:14}}>
-        <span style={{fontSize:26}}>{t.emoji}</span>
+        <div style={{width:46,height:46,borderRadius:14,background:open===i?"linear-gradient(135deg,#0D1B2A,#1A3A5C)":"#F0EBE0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0,transition:"all 0.2s"}}>{t.emoji}</div>
         <div style={{flex:1}}>
-          <div style={{fontSize:15,fontWeight:700,color:C.navy}}>{t.title}</div>
-          {open!==i&&<div style={{fontSize:12,color:C.muted,marginTop:2}}>Tap to see details</div>}
+          <div style={{fontSize:14.5,fontWeight:700,color:"#0D1B2A"}}>{t.title}</div>
+          {open!==i&&<div style={{fontSize:12,color:"#8A9BB0",marginTop:2,fontWeight:500}}>Tap for details</div>}
         </div>
-        <span style={{color:C.muted}}>{open===i?"▲":"▼"}</span>
+        <div style={{width:28,height:28,borderRadius:"50%",background:"#F7F4EF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"#8A9BB0",flexShrink:0}}>{open===i?"▲":"▼"}</div>
       </div>
-      {open===i&&<div style={{marginTop:14,paddingTop:14,borderTop:"1px solid #F0E8D8"}}>
-        <div style={{fontSize:14,color:C.navy,lineHeight:1.7,marginBottom:10}}>{t.detail}</div>
-        <div style={{background:"#FFFBF0",border:"1px solid #F0D080",borderRadius:12,padding:"10px 14px",fontSize:13,color:"#7A6020"}}>{t.tip}</div>
+      {open===i&&<div style={{marginTop:16,paddingTop:16,borderTop:"1px solid #F0EBE0"}}>
+        <div style={{fontSize:14,color:"#2C3E50",lineHeight:1.75,marginBottom:12}}>{t.detail}</div>
+        <div style={{background:"#FFFBF0",border:"1.5px solid #F0D080",borderRadius:12,padding:"11px 15px",fontSize:13,color:"#7A6020",fontWeight:500}}>{t.tip}</div>
       </div>}
     </div>)}
   </div>;
 }
 
+// ─── LINKS ────────────────────────────────────────────
 function LinksScreen(){
-  return <div style={{padding:"20px 20px 100px"}}>
-    <div style={{fontSize:22,fontWeight:800,color:C.navy,marginBottom:4}}>Useful Links 🔗</div>
-    <div style={{fontSize:14,color:C.muted,marginBottom:24}}>Everything you need in Stockholm — one tap away</div>
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Useful Links</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:24,fontWeight:500}}>Everything you need in Stockholm — one tap away</div>
     {LINKS.map((cat,ci)=><div key={ci} style={{marginBottom:28}}>
-      <div style={{fontSize:13,fontWeight:700,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:12}}>{cat.category}</div>
-      {cat.items.map((item,ii)=><a key={ii} href={item.url} target="_blank" rel="noreferrer" className="link-card" style={{display:"flex",alignItems:"center",gap:14,background:"#fff",borderRadius:16,padding:"16px 18px",marginBottom:10,textDecoration:"none",boxShadow:"0 2px 12px rgba(0,0,0,0.07)",borderLeft:`4px solid ${item.color}`}}>
-        <div style={{width:42,height:42,borderRadius:12,background:item.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{item.emoji}</div>
+      <div style={{fontSize:10,fontWeight:700,color:"#8A9BB0",letterSpacing:3,textTransform:"uppercase",marginBottom:12,display:"flex",alignItems:"center",gap:8}}>
+  
+        {cat.category}
+      </div>
+      {cat.items.map((item,ii)=><a key={ii} href={item.url} target="_blank" rel="noreferrer" className="link-card">
+        <div style={{width:44,height:44,borderRadius:12,background:item.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{item.emoji}</div>
         <div style={{flex:1}}>
-          <div style={{fontSize:14,fontWeight:700,color:C.navy,marginBottom:2}}>{item.name}</div>
-          <div style={{fontSize:12,color:C.muted}}>{item.desc}</div>
+          <div style={{fontSize:14,fontWeight:700,color:"#0D1B2A",marginBottom:2}}>{item.name}</div>
+          <div style={{fontSize:12,color:"#8A9BB0",fontWeight:500}}>{item.desc}</div>
         </div>
-        <span style={{color:C.muted,fontSize:18}}>→</span>
+        <span style={{color:"#C9A84C",fontSize:18,fontWeight:700}}>→</span>
       </a>)}
     </div>)}
-    <div style={{background:"#FFFBF0",border:"1px solid #F0D080",borderRadius:18,padding:20}}>
-      <div style={{fontSize:14,fontWeight:700,color:C.navy,marginBottom:6}}>💰 How you earn commission</div>
-      <div style={{fontSize:13,color:"#555",lineHeight:1.8}}>
-        🎯 <strong>GetYourGuide:</strong> Sign up at getyourguide.com/partner — earn 8–12% per booking<br/>
-        🍽️ <strong>TheFork:</strong> Sign up at thefork.com — earn per seated guest<br/>
-        🏨 <strong>Booking.com:</strong> Sign up at booking.com/affiliate — earn 25–40% of commission<br/>
-        🚕 <strong>Bolt:</strong> Share your referral code — earn per new user<br/>
-        <span style={{fontSize:12,color:C.muted}}>Replace the links above with your personal affiliate links after signing up!</span>
-      </div>
-    </div>
+
   </div>;
 }
 
+// ─── VIDEOS ───────────────────────────────────────────
 function VideosScreen(){
   const [playing,setPlaying]=useState(null);
-  return <div style={{padding:"20px 20px 100px"}}>
-    <div style={{fontSize:22,fontWeight:800,color:C.navy,marginBottom:4}}>Video Guides ▶️</div>
-    <div style={{fontSize:14,color:C.muted,marginBottom:24}}>Watch how to get around Stockholm like a local</div>
-    {VIDEOS.map((v,i)=><div key={i} style={{background:"#fff",borderRadius:20,overflow:"hidden",marginBottom:20,boxShadow:"0 2px 16px rgba(0,0,0,0.09)"}}>
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Video Guides</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:24,fontWeight:500}}>Watch Stockholm through local eyes</div>
+    {VIDEOS.map((v,i)=><div key={i} style={{background:"#fff",borderRadius:20,overflow:"hidden",marginBottom:18,boxShadow:"0 3px 20px rgba(0,0,0,0.09)"}}>
       {playing===i
-        ? <div style={{position:"relative",paddingBottom:"56.25%",height:0}}>
-            <iframe src={`https://www.youtube.com/embed/${v.id}?autoplay=1`} style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}} allow="autoplay;encrypted-media" allowFullScreen/>
-          </div>
-        : <div onClick={()=>setPlaying(i)} style={{position:"relative",cursor:"pointer",background:"#000",borderRadius:"20px 20px 0 0",overflow:"hidden"}}>
-            <img src={`https://img.youtube.com/vi/${v.id}/hqdefault.jpg`} style={{width:"100%",display:"block",opacity:0.85}} alt={v.title}/>
-            <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <div style={{width:64,height:64,borderRadius:"50%",background:"rgba(255,0,0,0.9)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>▶</div>
-            </div>
-          </div>
+        ?<div style={{position:"relative",paddingBottom:"56.25%",height:0}}>
+           <iframe src={`https://www.youtube.com/embed/${v.id}?autoplay=1`} style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}} allow="autoplay;encrypted-media" allowFullScreen/>
+         </div>
+        :<div onClick={()=>setPlaying(i)} style={{position:"relative",cursor:"pointer",background:"#111",overflow:"hidden"}}>
+           <img src={`https://img.youtube.com/vi/${v.id}/hqdefault.jpg`} style={{width:"100%",display:"block",opacity:0.85,transition:"opacity 0.2s"}} alt={v.title}
+             onMouseEnter={e=>e.target.style.opacity=1} onMouseLeave={e=>e.target.style.opacity=0.85}/>
+           <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.2)"}}>
+             <div style={{width:60,height:60,borderRadius:"50%",background:"rgba(255,0,0,0.92)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"}}>▶</div>
+           </div>
+         </div>
       }
-      <div style={{padding:"16px 18px"}}>
-        <div style={{fontSize:15,fontWeight:700,color:C.navy,marginBottom:4}}>{v.title}</div>
-        <div style={{fontSize:13,color:C.muted}}>{v.desc}</div>
+      <div style={{padding:"15px 18px"}}>
+        <div style={{fontSize:15,fontWeight:700,color:"#0D1B2A",marginBottom:3}}>{v.title}</div>
+        <div style={{fontSize:13,color:"#8A9BB0",fontWeight:500}}>{v.desc}</div>
       </div>
     </div>)}
-    <div style={{background:C.cream,borderRadius:16,padding:16,fontSize:13,color:"#555",lineHeight:1.7,marginBottom:14}}>
-      📹 Videos by <strong>@stockholmwalkthrough</strong> — a local Stockholm creator!<br/>
-      <span style={{fontSize:12,color:C.muted}}>More videos added regularly — subscribe for updates</span>
-    </div>
-    <a href="https://www.youtube.com/@stockholmwalkthrough" target="_blank" rel="noreferrer" style={{display:"block",background:"linear-gradient(135deg,#FF0000,#CC0000)",color:"#fff",borderRadius:16,padding:"16px 20px",textDecoration:"none",marginBottom:12,textAlign:"center"}}>
-      <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>▶️ Subscribe on YouTube</div>
-      <div style={{fontSize:12,opacity:0.85}}>@stockholmwalkthrough — more Stockholm videos →</div>
+    <a href="https://www.youtube.com/@stockholmwalkthrough" target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:14,background:"#FF0000",borderRadius:16,padding:"16px 20px",textDecoration:"none",marginBottom:12}}>
+      <span style={{fontSize:24}}>▶️</span>
+      <div>
+        <div style={{fontSize:14,fontWeight:700,color:"#fff",marginBottom:2}}>Subscribe on YouTube</div>
+        <div style={{fontSize:12,color:"rgba(255,255,255,0.8)"}}>@stockholmwalkthrough — more Stockholm videos</div>
+      </div>
+      <span style={{color:"rgba(255,255,255,0.7)",fontSize:18,marginLeft:"auto"}}>→</span>
     </a>
-    <a href={LINKTREE} target="_blank" rel="noreferrer" style={{display:"block",background:"linear-gradient(135deg,#43E97B,#38F9D7)",color:"#1a1a1a",borderRadius:16,padding:"16px 20px",textDecoration:"none",textAlign:"center"}}>
-      <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>🌿 All Links — stockholmwalkthrough</div>
-      <div style={{fontSize:12,opacity:0.7}}>Instagram, TikTok, more videos and resources →</div>
+    <a href={LINKTREE} target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:14,background:"linear-gradient(135deg,#43E97B,#38F9D7)",borderRadius:16,padding:"16px 20px",textDecoration:"none"}}>
+      <span style={{fontSize:24}}>🌿</span>
+      <div>
+        <div style={{fontSize:14,fontWeight:700,color:"#1a1a1a",marginBottom:2}}>All Links & Socials</div>
+        <div style={{fontSize:12,color:"rgba(0,0,0,0.6)"}}>Instagram, TikTok & more resources</div>
+      </div>
+      <span style={{color:"rgba(0,0,0,0.4)",fontSize:18,marginLeft:"auto"}}>→</span>
     </a>
   </div>;
 }
 
+// ─── FOOD ─────────────────────────────────────────────
 function Food({onNav}){
   const [time,setTime]=useState("Right now");
   const opts=["Right now","Breakfast","Lunch","Dinner","Late night 🌙"];
-  const prompts={"Right now":"What restaurants are open right now near Södermalm/Slussen Stockholm? Give 5 specific options with price range.","Breakfast":"Best breakfast spots in Stockholm Södermalm? Give 5 specific places.","Lunch":"Best value lunch spots in central Stockholm? 5 specific recommendations.","Dinner":"Best dinner restaurants in Stockholm? Mix of budget, mid-range, and special occasion. 5 places.","Late night 🌙":"What food is open after midnight in Stockholm near Slussen? Be specific."};
-  return <div style={{padding:"20px 20px 100px"}}>
-    <div style={{fontSize:22,fontWeight:800,color:C.navy,marginBottom:4}}>Food & Drinks 🍕</div>
-    <div style={{fontSize:14,color:C.muted,marginBottom:20}}>Real recommendations from your local guide</div>
+  const prompts={
+    "Right now":"What food places are reliably open right now near Södermalm/Slussen Stockholm? Only tell me about places you're genuinely confident are open. Give 4-5 options with price range.",
+    "Breakfast":"Best breakfast spots in Stockholm Södermalm area? Give 5 specific places with what makes each special and price range.",
+    "Lunch":"Best value lunch spots in central Stockholm? 5 specific recommendations with price range.",
+    "Dinner":"Best dinner restaurants in Stockholm? Mix of budget, mid-range, and special occasion. 5 places with price range and booking advice.",
+    "Late night 🌙":"What food options are reliably open late at night (after midnight) in Stockholm near Slussen? Only mention places you're confident stay open late."
+  };
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Food & Drinks</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:20,fontWeight:500}}>Real recommendations — always verify on Google Maps 📍</div>
     <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:24}}>
-      {opts.map(t=><button key={t} onClick={()=>setTime(t)} style={{background:time===t?C.navy:"#fff",color:time===t?"#fff":C.navy,border:`1.5px solid ${time===t?C.navy:"#E0D8C8"}`,borderRadius:50,padding:"9px 16px",fontSize:13,fontWeight:600,cursor:"pointer"}}>{t}</button>)}
+      {opts.map(t=><button key={t} onClick={()=>setTime(t)} className="pill" style={{background:time===t?"#0D1B2A":"#fff",color:time===t?"#fff":"#0D1B2A",border:`1.5px solid ${time===t?"#0D1B2A":"#EAE4D8"}`,padding:"9px 16px",fontSize:13}}>{t}</button>)}
     </div>
-    <button onClick={()=>onNav("chat",prompts[time])} style={{width:"100%",background:`linear-gradient(135deg,${C.navy},${C.blue})`,color:"#fff",border:"none",borderRadius:16,padding:18,fontSize:15,fontWeight:700,cursor:"pointer",marginBottom:16}}>
+    <button onClick={()=>onNav("chat",prompts[time])} className="navy-btn" style={{width:"100%",borderRadius:16,padding:17,fontSize:14,fontWeight:700,marginBottom:14}}>
       💬 Get {time} recommendations →
     </button>
-    <a href="https://www.thefork.com/restaurants/stockholm-c415144" target="_blank" style={{display:"block",background:"linear-gradient(135deg,#E74C3C,#C0392B)",color:"#fff",borderRadius:16,padding:"16px 20px",textDecoration:"none",marginBottom:12}}>
-      <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>🍽️ Reserve a Table in Stockholm</div>
-      <div style={{fontSize:12,opacity:0.85}}>Browse & book instantly on TheFork →</div>
+    <a href="https://www.thefork.com/restaurants/stockholm-c415144" target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:14,background:"linear-gradient(135deg,#E74C3C,#C0392B)",borderRadius:16,padding:"16px 20px",textDecoration:"none",marginBottom:10}}>
+      <span style={{fontSize:24}}>🍽️</span>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:700,color:"#fff",marginBottom:2}}>Reserve a Table on TheFork</div>
+        <div style={{fontSize:12,color:"rgba(255,255,255,0.8)"}}>Browse Stockholm restaurants & book instantly</div>
+      </div>
+      <span style={{color:"rgba(255,255,255,0.7)",fontSize:18}}>→</span>
     </a>
-    <a href="https://www.foodora.se/en/city/stockholm" target="_blank" style={{display:"block",background:"linear-gradient(135deg,#D70F64,#A00040)",color:"#fff",borderRadius:16,padding:"16px 20px",textDecoration:"none"}}>
-      <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>🛵 Order Food Delivery</div>
-      <div style={{fontSize:12,opacity:0.85}}>Foodora delivers to your hotel →</div>
+    <a href="https://www.foodora.se/en/city/stockholm" target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:14,background:"linear-gradient(135deg,#D70F64,#A00040)",borderRadius:16,padding:"16px 20px",textDecoration:"none"}}>
+      <span style={{fontSize:24}}>🛵</span>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:700,color:"#fff",marginBottom:2}}>Order Food Delivery</div>
+        <div style={{fontSize:12,color:"rgba(255,255,255,0.8)"}}>Foodora delivers directly to your hotel</div>
+      </div>
+      <span style={{color:"rgba(255,255,255,0.7)",fontSize:18}}>→</span>
     </a>
   </div>;
 }
 
+// ─── TO DO ────────────────────────────────────────────
 function ToDo({onNav}){
   const [sel,setSel]=useState("Full day");
   const opts=["2 hours","Half day","Full day","Rainy day ☔","With kids 👨‍👩‍👧","Free only 💸"];
-  const prompts={"2 hours":"I have 2 hours near Slussen Stockholm. What's the single best thing to do? Specific directions.","Half day":"Build a 4-hour Stockholm itinerary from Slussen. Include sights and a café stop.","Full day":"Perfect full day Stockholm itinerary from Slussen. Morning, lunch, afternoon, evening. Specific.","Rainy day ☔":"Best indoor things in Stockholm on a rainy day. Full rainy day itinerary.","With kids 👨‍👩‍👧":"Best full day with young children in Stockholm. Kid-friendly, from Södermalm.","Free only 💸":"Best completely free things in Stockholm. Full day with only free activities."};
-  return <div style={{padding:"20px 20px 100px"}}>
-    <div style={{fontSize:22,fontWeight:800,color:C.navy,marginBottom:4}}>Things To Do 📍</div>
-    <div style={{fontSize:14,color:C.muted,marginBottom:20}}>Pick your situation, get a real local plan</div>
+  const prompts={
+    "2 hours":"I have only 2 hours near Slussen Stockholm. What's the single best thing to do? Be specific with walking directions and timing.",
+    "Half day":"Build me a 4-hour Stockholm itinerary starting from Slussen. Include a mix of sights and one café stop.",
+    "Full day":"Build me a perfect full day Stockholm itinerary starting from Slussen. Morning, lunch spot, afternoon, and evening plan. Specific places, transport tips, and honest timing.",
+    "Rainy day ☔":"What are the best indoor things to do in Stockholm on a rainy day? Full rainy day plan with museums and indoor cafés.",
+    "With kids 👨‍👩‍👧":"Best full day with young children in Stockholm starting from Södermalm. Kid-friendly museums, outdoor spots, food stops.",
+    "Free only 💸":"Best completely free day in Stockholm — full itinerary using only free or very cheap activities."
+  };
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Things To Do</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:20,fontWeight:500}}>Pick your situation and get a real local plan</div>
     <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:24}}>
-      {opts.map(h=><button key={h} onClick={()=>setSel(h)} style={{background:sel===h?C.navy:"#fff",color:sel===h?"#fff":C.navy,border:`1.5px solid ${sel===h?C.navy:"#E0D8C8"}`,borderRadius:50,padding:"9px 16px",fontSize:13,fontWeight:600,cursor:"pointer"}}>{h}</button>)}
+      {opts.map(h=><button key={h} onClick={()=>setSel(h)} className="pill" style={{background:sel===h?"#0D1B2A":"#fff",color:sel===h?"#fff":"#0D1B2A",border:`1.5px solid ${sel===h?"#0D1B2A":"#EAE4D8"}`,padding:"9px 16px",fontSize:13}}>{h}</button>)}
     </div>
-    <button onClick={()=>onNav("chat",prompts[sel])} style={{width:"100%",background:`linear-gradient(135deg,${C.navy},${C.blue})`,color:"#fff",border:"none",borderRadius:16,padding:18,fontSize:15,fontWeight:700,cursor:"pointer",marginBottom:16}}>
+    <button onClick={()=>onNav("chat",prompts[sel])} className="navy-btn" style={{width:"100%",borderRadius:16,padding:17,fontSize:14,fontWeight:700,marginBottom:14}}>
       🗓️ Build my {sel} plan →
     </button>
-    <a href="https://www.getyourguide.com/stockholm-l30/" target="_blank" style={{display:"block",background:`linear-gradient(135deg,${C.gold},${C.goldLight})`,color:C.navy,borderRadius:16,padding:"16px 20px",textDecoration:"none"}}>
-      <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>🎟️ Book Stockholm Tours & Activities</div>
-      <div style={{fontSize:12,opacity:0.7}}>Skip the queue — book on GetYourGuide →</div>
+    <a href="https://www.getyourguide.com/stockholm-l30/" target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:14,background:"linear-gradient(135deg,#C9A84C,#E8C84A)",borderRadius:16,padding:"16px 20px",textDecoration:"none"}}>
+      <span style={{fontSize:24}}>🎟️</span>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:700,color:"#1a1000",marginBottom:2}}>Book Stockholm Tours & Activities</div>
+        <div style={{fontSize:12,color:"rgba(0,0,0,0.6)"}}>Skip the queue — book on GetYourGuide</div>
+      </div>
+      <span style={{color:"rgba(0,0,0,0.4)",fontSize:18}}>→</span>
     </a>
   </div>;
 }
 
+// ─── GEMS ─────────────────────────────────────────────
 function Gems(){
   const tags=["All","Nightlife","Café","View","Culture","Nature","Food","Shopping"];
   const [tag,setTag]=useState("All");
   const filtered=tag==="All"?GEMS:GEMS.filter(g=>g.tag===tag);
-  return <div style={{padding:"20px 20px 100px"}}>
-    <div style={{fontSize:22,fontWeight:800,color:C.navy,marginBottom:4}}>Hidden Gems 💎</div>
-    <div style={{fontSize:14,color:C.muted,marginBottom:20}}>Local secrets most tourists never find</div>
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Hidden Gems</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:20,fontWeight:500}}>Local secrets most tourists never find</div>
     <div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:24,paddingBottom:4}}>
-      {tags.map(t=><button key={t} onClick={()=>setTag(t)} style={{background:tag===t?C.gold:"#fff",color:C.navy,border:`1.5px solid ${tag===t?C.gold:"#E0D8C8"}`,borderRadius:50,padding:"8px 16px",fontSize:13,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>{t}</button>)}
+      {tags.map(t=><button key={t} onClick={()=>setTag(t)} className="pill" style={{background:tag===t?"#C9A84C":"#fff",color:"#0D1B2A",border:`1.5px solid ${tag===t?"#C9A84C":"#EAE4D8"}`,padding:"8px 16px",fontSize:13,whiteSpace:"nowrap",flexShrink:0}}>{t}</button>)}
     </div>
-    {filtered.map((g,i)=><div key={i} style={{background:"#fff",borderRadius:20,padding:20,marginBottom:14,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",borderLeft:`4px solid ${C.gold}`}}>
+    {filtered.map((g,i)=><div key={i} className="card" style={{borderRadius:20,padding:20,marginBottom:12,borderLeft:"4px solid #C9A84C"}}>
       <div style={{display:"flex",alignItems:"flex-start",gap:14}}>
-        <span style={{fontSize:28,flexShrink:0}}>{g.emoji}</span>
-        <div>
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,flexWrap:"wrap"}}>
-            <span style={{fontSize:16,fontWeight:800,color:C.navy}}>{g.title}</span>
-            <span style={{fontSize:11,background:"#FFFBF0",color:"#7A6020",border:"1px solid #F0D080",borderRadius:50,padding:"2px 8px",fontWeight:600}}>{g.tag}</span>
+        <div style={{width:48,height:48,borderRadius:14,background:"#F7F4EF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,flexShrink:0}}>{g.emoji}</div>
+        <div style={{flex:1}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:5,flexWrap:"wrap"}}>
+            <span style={{fontSize:15,fontWeight:700,color:"#0D1B2A"}}>{g.title}</span>
+            <span style={{fontSize:10,background:"#FFFBF0",color:"#7A6020",border:"1px solid #F0D080",borderRadius:50,padding:"2px 9px",fontWeight:700,letterSpacing:0.5}}>{g.tag}</span>
           </div>
-          <div style={{fontSize:13.5,color:"#444",lineHeight:1.6}}>{g.desc}</div>
+          <div style={{fontSize:13.5,color:"#444",lineHeight:1.65}}>{g.desc}</div>
         </div>
       </div>
     </div>)}
   </div>;
 }
 
+// ─── EMERGENCY ────────────────────────────────────────
 function Emergency(){
-  return <div style={{padding:"20px 20px 100px"}}>
-    <div style={{background:`linear-gradient(135deg,${C.red},#A93226)`,borderRadius:20,padding:20,marginBottom:24}}>
-      <div style={{fontSize:22,fontWeight:800,color:"#fff",marginBottom:4}}>🆘 Emergency Info</div>
-      <div style={{fontSize:13,color:"rgba(255,255,255,0.85)"}}>Sweden emergency number: <strong>112</strong> — free, 24/7, English spoken</div>
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div style={{background:"linear-gradient(135deg,#C0392B,#922B21)",borderRadius:20,padding:"20px 22px",marginBottom:24,boxShadow:"0 4px 20px rgba(192,57,43,0.3)"}}>
+      <div className="serif" style={{fontSize:24,fontWeight:900,color:"#fff",marginBottom:4}}>🆘 Emergency Info</div>
+      <div style={{fontSize:14,color:"rgba(255,255,255,0.85)",fontWeight:500}}>Sweden emergency: <strong>112</strong> — free, 24/7, English spoken</div>
     </div>
-    {EMERGENCY.map((e,i)=><div key={i} style={{background:"#fff",borderRadius:18,padding:"18px 20px",marginBottom:12,boxShadow:"0 2px 12px rgba(0,0,0,0.07)",borderLeft:`4px solid ${e.color}`}}>
+    {EMERGENCY.map((e,i)=><div key={i} className="card" style={{borderRadius:16,padding:"17px 20px",marginBottom:10,borderLeft:`4px solid ${e.color}`}}>
       <div style={{display:"flex",alignItems:"center",gap:14}}>
-        <span style={{fontSize:26}}>{e.emoji}</span>
+        <div style={{width:44,height:44,borderRadius:12,background:"#F7F4EF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{e.emoji}</div>
         <div>
-          <div style={{fontSize:14,fontWeight:700,color:C.navy,marginBottom:3}}>{e.title}</div>
-          <div style={{fontSize:13,color:"#555"}}>{e.detail}</div>
+          <div style={{fontSize:14,fontWeight:700,color:"#0D1B2A",marginBottom:3}}>{e.title}</div>
+          <div style={{fontSize:13,color:"#555",fontWeight:500}}>{e.detail}</div>
         </div>
       </div>
     </div>)}
-    <div style={{background:"#FFFBF0",border:"1px solid #F0D080",borderRadius:18,padding:20,marginTop:8}}>
-      <div style={{fontSize:14,fontWeight:700,color:C.navy,marginBottom:8}}>💡 Good to know in Sweden</div>
-      <div style={{fontSize:13,color:"#555",lineHeight:1.9}}>
+    <div style={{background:"#FFFBF0",border:"1.5px solid #F0D080",borderRadius:18,padding:"18px 20px",marginTop:8}}>
+      <div style={{fontSize:13,fontWeight:700,color:"#0D1B2A",marginBottom:10}}>💡 Good to know in Sweden</div>
+      <div style={{fontSize:13,color:"#555",lineHeight:2}}>
         🏥 Tourists can access emergency healthcare<br/>
-        💳 Sweden is nearly cashless — card accepted everywhere<br/>
+        💳 Sweden nearly cashless — card accepted everywhere<br/>
         🚭 Smoking banned inside all public buildings<br/>
         🍺 Alcohol only sold in Systembolaget stores<br/>
         🌡️ Tap water is safe and delicious everywhere
@@ -431,6 +528,7 @@ function Emergency(){
   </div>;
 }
 
+// ─── ITINERARY ────────────────────────────────────────
 function Itinerary({onNav}){
   const [hours,setHours]=useState("Full day (8hr)");
   const [vibe,setVibe]=useState([]);
@@ -439,57 +537,46 @@ function Itinerary({onNav}){
   const toggle=v=>setVibe(p=>p.includes(v)?p.filter(x=>x!==v):[...p,v]);
   const build=()=>{
     const v=vibe.length?vibe.join(", "):"mix of everything";
-    return `Build me a detailed ${hours} Stockholm itinerary. I'm interested in: ${v}. Starting from Slussen/Södermalm. Include specific place names, times, transport tips, and one local secret. Format with clear time slots.`;
+    return `Build me a detailed ${hours} Stockholm itinerary. Interests: ${v}. Starting from Slussen/Södermalm. Give specific place names, realistic times, honest transport tips, and one real local secret. Format clearly with time slots.`;
   };
-  return <div style={{padding:"20px 20px 100px"}}>
-    <div style={{fontSize:22,fontWeight:800,color:C.navy,marginBottom:4}}>Build My Day 🗓️</div>
-    <div style={{fontSize:14,color:C.muted,marginBottom:24}}>Get a custom Stockholm plan just for you</div>
-    <div style={{background:"#fff",borderRadius:20,padding:20,marginBottom:16,boxShadow:"0 2px 12px rgba(0,0,0,0.07)"}}>
-      <div style={{fontSize:14,fontWeight:700,color:C.navy,marginBottom:12}}>How much time do you have?</div>
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Build My Day</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:24,fontWeight:500}}>Get a custom Stockholm plan made just for you</div>
+    <div className="card" style={{borderRadius:20,padding:20,marginBottom:14}}>
+      <div style={{fontSize:13,fontWeight:700,color:"#0D1B2A",marginBottom:12}}>How much time do you have?</div>
       <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-        {hoursOpts.map(h=><button key={h} onClick={()=>setHours(h)} style={{background:hours===h?C.navy:"#F5F0E8",color:hours===h?"#fff":C.navy,border:"none",borderRadius:50,padding:"9px 16px",fontSize:13,fontWeight:600,cursor:"pointer"}}>{h}</button>)}
+        {hoursOpts.map(h=><button key={h} onClick={()=>setHours(h)} className="pill" style={{background:hours===h?"#0D1B2A":"#F7F4EF",color:hours===h?"#fff":"#0D1B2A",padding:"9px 16px",fontSize:13}}>{h}</button>)}
       </div>
     </div>
-    <div style={{background:"#fff",borderRadius:20,padding:20,marginBottom:20,boxShadow:"0 2px 12px rgba(0,0,0,0.07)"}}>
-      <div style={{fontSize:14,fontWeight:700,color:C.navy,marginBottom:12}}>What are you into? (pick any)</div>
+    <div className="card" style={{borderRadius:20,padding:20,marginBottom:20}}>
+      <div style={{fontSize:13,fontWeight:700,color:"#0D1B2A",marginBottom:12}}>What are you into? (pick any)</div>
       <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-        {vibeOpts.map(v=><button key={v} onClick={()=>toggle(v)} style={{background:vibe.includes(v)?C.gold:"#F5F0E8",color:C.navy,border:"none",borderRadius:50,padding:"9px 14px",fontSize:13,fontWeight:600,cursor:"pointer"}}>{v}</button>)}
+        {vibeOpts.map(v=><button key={v} onClick={()=>toggle(v)} className="pill" style={{background:vibe.includes(v)?"#C9A84C":"#F7F4EF",color:"#0D1B2A",padding:"9px 14px",fontSize:13}}>{v}</button>)}
       </div>
     </div>
-    <button onClick={()=>onNav("chat",build())} style={{width:"100%",background:`linear-gradient(135deg,${C.gold},${C.goldLight})`,color:C.navy,border:"none",borderRadius:16,padding:18,fontSize:16,fontWeight:800,cursor:"pointer",boxShadow:"0 4px 20px rgba(201,168,76,0.3)"}}>
+    <button onClick={()=>onNav("chat",build())} className="gold-btn" style={{width:"100%",borderRadius:16,padding:18,fontSize:16,fontWeight:800}}>
       ✨ Build my perfect day →
     </button>
   </div>;
 }
 
+// ─── APP ──────────────────────────────────────────────
 function App(){
   const [screen,setScreen]=useState("home");
   const [chatInit,setChatInit]=useState("");
   const [large,setLarge]=useState(false);
-
   const [location,setLocation]=useState("");
 
-  // Get user location on load
   useEffect(()=>{
     if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(
-        pos=>{
-          const {latitude:lat,longitude:lng}=pos.coords;
-          fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
-            .then(r=>r.json())
-            .then(d=>{
-              const addr=d.address;
-              const loc=addr.neighbourhood||addr.suburb||addr.city_district||addr.city||"Stockholm";
-              setLocation(loc+", Stockholm");
-            })
-            .catch(()=>setLocation("Stockholm"));
-        },
-        ()=>setLocation("")
-      );
+      navigator.geolocation.getCurrentPosition(pos=>{
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`)
+          .then(r=>r.json())
+          .then(d=>{const a=d.address;setLocation((a.neighbourhood||a.suburb||a.city_district||a.city||"Stockholm")+", Stockholm");})
+          .catch(()=>{});
+      },()=>{});
     }
   },[]);
-
-
 
   const nav=(s,msg="")=>{
     if(msg){setChatInit(msg);setScreen("chat");}
@@ -505,15 +592,22 @@ function App(){
     {id:"emergency",emoji:"🆘",label:"Help"},
   ];
 
-  const titles={chat:"Ask Local AI 💬",transport:"Getting Around 🚇",food:"Food & Drinks 🍕",todo:"Things To Do 📍",gems:"Hidden Gems 💎",emergency:"Emergency Help 🆘",itinerary:"Build My Day 🗓️",links:"Useful Links 🔗",videos:"Video Guides ▶️"};
+  const titles={
+    chat:"Ask Local AI 💬",transport:"Getting Around 🚇",food:"Food & Drinks 🍕",
+    todo:"Things To Do 📍",gems:"Hidden Gems 💎",emergency:"Emergency Help 🆘",
+    itinerary:"Build My Day 🗓️",links:"Useful Links 🔗",videos:"Video Guides ▶️"
+  };
 
-  return <div style={{fontFamily:"'Segoe UI',system-ui,sans-serif",background:"#FAF8F4",minHeight:"100vh",fontSize:large?"110%":"100%"}}>
-    {screen!=="home"&&<div style={{background:"#fff",padding:"16px 20px",display:"flex",alignItems:"center",gap:14,borderBottom:"1px solid #F0E8D8",position:"sticky",top:0,zIndex:10,boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
-      <button onClick={()=>setScreen("home")} style={{background:"#F5F0E8",border:"none",borderRadius:"50%",width:38,height:38,fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>←</button>
-      <div style={{fontSize:16,fontWeight:800,color:C.navy,flex:1}}>{titles[screen]}</div>
-      <button onClick={()=>setLarge(p=>!p)} style={{background:large?C.gold:"#F5F0E8",border:"none",borderRadius:50,padding:"6px 12px",fontSize:12,fontWeight:700,cursor:"pointer",color:C.navy}}>{large?"A-":"A+"}</button>
+  return <div style={{fontFamily:"'DM Sans',sans-serif",background:"#F7F4EF",minHeight:"100vh",fontSize:large?"110%":"100%"}}>
+
+    {/* Header for inner screens */}
+    {screen!=="home"&&<div style={{background:"#fff",padding:"14px 18px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #EAE4D8",position:"sticky",top:0,zIndex:10,boxShadow:"0 2px 16px rgba(0,0,0,0.07)"}}>
+      <button onClick={()=>setScreen("home")} style={{width:38,height:38,borderRadius:"50%",background:"#F7F4EF",border:"none",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>←</button>
+      <div className="serif" style={{fontSize:17,fontWeight:900,color:"#0D1B2A",flex:1}}>{titles[screen]}</div>
+      <button onClick={()=>setLarge(p=>!p)} style={{background:large?"#C9A84C":"#F7F4EF",border:"none",borderRadius:50,padding:"6px 12px",fontSize:12,fontWeight:700,cursor:"pointer",color:"#0D1B2A"}}>{large?"A-":"A+"}</button>
     </div>}
 
+    {/* Screens */}
     {screen==="home"&&<Home onNav={nav} location={location}/>}
     {screen==="chat"&&<Chat key={chatInit} initMsg={chatInit} location={location}/>}
     {screen==="transport"&&<Transport/>}
@@ -525,11 +619,12 @@ function App(){
     {screen==="links"&&<LinksScreen/>}
     {screen==="videos"&&<VideosScreen/>}
 
-    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:"#fff",borderTop:"1px solid #F0E8D8",display:"flex",padding:"8px 0 12px",boxShadow:"0 -4px 20px rgba(0,0,0,0.08)",zIndex:100}}>
-      {navItems.map(item=><button key={item.id} onClick={()=>nav(item.id)} style={{flex:1,background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"6px 4px"}}>
-        <span style={{fontSize:22,filter:screen===item.id?"none":"grayscale(0.3) opacity(0.6)"}}>{item.emoji}</span>
-        <span style={{fontSize:10,fontWeight:700,color:screen===item.id?C.navy:C.muted,letterSpacing:0.5}}>{item.label}</span>
-        {screen===item.id&&<div style={{width:20,height:3,background:C.gold,borderRadius:2}}/>}
+    {/* Bottom Nav */}
+    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"#fff",borderTop:"1px solid #EAE4D8",display:"flex",padding:"8px 0 14px",boxShadow:"0 -4px 24px rgba(0,0,0,0.09)",zIndex:100}}>
+      {navItems.map(item=><button key={item.id} onClick={()=>nav(item.id)} style={{flex:1,background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"5px 4px"}}>
+        <span style={{fontSize:21,filter:screen===item.id?"none":"grayscale(0.5) opacity(0.55)",transition:"filter 0.15s"}}>{item.emoji}</span>
+        <span style={{fontSize:10,fontWeight:700,color:screen===item.id?"#0D1B2A":"#8A9BB0",letterSpacing:0.3,fontFamily:"'DM Sans',sans-serif"}}>{item.label}</span>
+        {screen===item.id&&<div style={{width:18,height:3,background:"#C9A84C",borderRadius:2}}/>}
       </button>)}
     </div>
   </div>;
