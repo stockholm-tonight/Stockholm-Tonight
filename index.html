@@ -94,7 +94,7 @@ const LINKS = [
   {
     category:"🏆 Best for Bookings",
     items:[
-      {name:"GetYourGuide Stockholm",desc:"Book tours & activities — skip the queue, best prices",url:"https://www.getyourguide.com/stockholm-l30/",color:"#FF5533",emoji:"🎯"},
+      {name:"GetYourGuide Stockholm",desc:"Book tours & activities — skip the queue, best prices",url:"https://gyg.me/xqrK5hiJ",color:"#FF5533",emoji:"🎯"},
       {name:"TheFork Stockholm",desc:"Reserve restaurant tables — tracked bookings, earn per guest",url:"https://www.thefork.com/restaurants/stockholm-c415144",color:"#00B551",emoji:"🍴"},
       {name:"Booking.com Stockholm",desc:"Hotels & accommodation — best prices guaranteed",url:"https://www.booking.com/city/se/stockholm.en-gb.html",color:"#003580",emoji:"🏨"},
     ]
@@ -125,9 +125,27 @@ const LINKS = [
   {
     category:"🎟️ Activities & Tickets",
     items:[
+      {name:"Stockholm Pass (GoCity)",desc:"All-inclusive pass — 60+ attractions, skip queues, save money",url:"https://gocity.com/stockholm/en-us",color:"#E74C3C",emoji:"🏆"},
       {name:"Viator Stockholm",desc:"Skip-the-line tickets and guided tours",url:"https://www.viator.com/Stockholm/d976-ttd",color:"#1A1A2E",emoji:"🎫"},
       {name:"ABBA Museum",desc:"Book in advance — often sells out",url:"https://www.abbathemuseum.com/en/",color:"#D4AC0D",emoji:"🎤"},
       {name:"Vasa Museum",desc:"World's best preserved 17th century warship",url:"https://www.vasamuseet.se/en",color:"#8B4513",emoji:"⚓"},
+    ]
+  },
+  {
+    category:"🚗 Premium Transport",
+    items:[
+      {name:"Blacklane Chauffeur",desc:"Luxury airport transfers — professional drivers, fixed price",url:"https://www.blacklane.com/en/destination/sweden/stockholm/",color:"#1a1a1a",emoji:"🖤"},
+      {name:"Rentalcars.com",desc:"Best car rental prices — compare all companies",url:"https://www.rentalcars.com/en/city/sweden/stockholm/",color:"#E67E22",emoji:"🚗"},
+      {name:"Arlanda Express",desc:"Fastest airport train — 20 min to city centre",url:"https://www.arlandaexpress.com/",color:"#005B99",emoji:"🚄"},
+    ]
+  },
+  {
+    category:"🏨 Where to Stay",
+    items:[
+      {name:"Scandic Hotels Stockholm",desc:"Sweden's biggest hotel chain — reliable and comfortable",url:"https://www.scandichotels.com/hotels/sweden/stockholm",color:"#D4001A",emoji:"🏨"},
+      {name:"Strawberry Hotels",desc:"Stylish Nordic hotels — great locations in Stockholm",url:"https://www.strawberry.se/hotell/sverige/stockholm/",color:"#FF6B9D",emoji:"🍓"},
+      {name:"Vrbo Stockholm",desc:"Private apartments — ideal for families and longer stays",url:"https://www.vrbo.com/vacation-rentals/europe/sweden/stockholm",color:"#3D5A80",emoji:"🏠"},
+      {name:"Airalo eSIM",desc:"Swedish data SIM — works instantly on your phone on arrival",url:"https://www.airalo.com/sweden-esim",color:"#6C5CE7",emoji:"📱"},
     ]
   },
 ];
@@ -216,6 +234,14 @@ function Home({onNav,location}){
 
     {/* Action buttons */}
     <div style={{padding:"4px 16px 0",display:"flex",flexDirection:"column",gap:10}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+        <button onClick={()=>onNav("daytime")} style={{background:"linear-gradient(135deg,#F39C12,#E67E22)",border:"none",borderRadius:16,padding:"16px 12px",fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 2px 14px rgba(243,156,18,0.3)"}}>
+          ☀️ Daytime Guide
+        </button>
+        <button onClick={()=>onNav("nightlife")} style={{background:"linear-gradient(135deg,#1a1a2e,#16213e)",border:"none",borderRadius:16,padding:"16px 12px",fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,boxShadow:"0 2px 14px rgba(0,0,0,0.2)"}}>
+          🌙 Nightlife Guide
+        </button>
+      </div>
       <button onClick={()=>onNav("links")} style={{width:"100%",background:"#fff",border:"2px solid #C9A84C",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:"#0D1B2A",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(201,168,76,0.15)"}}>
         🔗 Useful Stockholm Links & Apps
       </button>
@@ -462,7 +488,7 @@ function ToDo({onNav}){
     <button onClick={()=>onNav("chat",prompts[sel])} className="navy-btn" style={{width:"100%",borderRadius:16,padding:17,fontSize:14,fontWeight:700,marginBottom:14}}>
       🗓️ Build my {sel} plan →
     </button>
-    <a href="https://www.getyourguide.com/stockholm-l30/" target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:14,background:"linear-gradient(135deg,#C9A84C,#E8C84A)",borderRadius:16,padding:"16px 20px",textDecoration:"none"}}>
+    <a href="https://gyg.me/xqrK5hiJ" target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:14,background:"linear-gradient(135deg,#C9A84C,#E8C84A)",borderRadius:16,padding:"16px 20px",textDecoration:"none"}}>
       <span style={{fontSize:24}}>🎟️</span>
       <div style={{flex:1}}>
         <div style={{fontSize:14,fontWeight:700,color:"#1a1000",marginBottom:2}}>Book Stockholm Tours & Activities</div>
@@ -560,6 +586,60 @@ function Itinerary({onNav}){
   </div>;
 }
 
+// ─── DAYTIME ──────────────────────────────────────────
+function Daytime({onNav}){
+  const passes=[
+    {name:"Stockholm Pass (GoCity)",desc:"60+ attractions included — Vasa Museum, ABBA Museum, boat tours, hop-on bus. Huge savings if you visit multiple sites.",price:"From ~650 SEK/day",url:"https://gocity.com/stockholm/en-us",emoji:"🏆",color:"#E74C3C"},
+    {name:"Arlanda Express",desc:"Fastest way from airport to city — 20 minutes, no stress, no stops.",price:"~310 SEK one way",url:"https://www.arlandaexpress.com/",emoji:"🚄",color:"#005B99"},
+    {name:"Book Breakfast & Lunch",desc:"Reserve a table at Stockholm's best spots — instant confirmation, free cancellation.",price:"Varies",url:"https://www.thefork.com/restaurants/stockholm-c415144",emoji:"🥐",color:"#F39C12"},
+    {name:"Bike the City",desc:"City bikes available across Stockholm April–October. Perfect for Djurgården loop.",price:"165 SEK / 3 days",url:"https://citybikes.se/",emoji:"🚲",color:"#27AE60"},
+    {name:"Museum Day Pass",desc:"Plan your museum day — Vasa, Moderna, Fotografiska, Historiska all in Djurgården.",price:"Varies per museum",url:"https://gyg.me/xqrK5hiJ",emoji:"🏛️",color:"#8E44AD"},
+  ];
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Daytime in Stockholm</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:24,fontWeight:500}}>Make the most of your day — best passes & bookings</div>
+    {passes.map((p,i)=><a key={i} href={p.url} target="_blank" rel="noreferrer" className="link-card" style={{display:"flex",alignItems:"center",gap:14,background:"#fff",borderRadius:18,padding:"18px 20px",marginBottom:12,textDecoration:"none",boxShadow:"0 2px 16px rgba(0,0,0,0.08)",borderLeft:`4px solid ${p.color}`}}>
+      <div style={{width:48,height:48,borderRadius:14,background:p.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{p.emoji}</div>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:700,color:"#0D1B2A",marginBottom:3}}>{p.name}</div>
+        <div style={{fontSize:12,color:"#8A9BB0",marginBottom:4,lineHeight:1.4}}>{p.desc}</div>
+        <div style={{fontSize:12,fontWeight:700,color:p.color}}>{p.price}</div>
+      </div>
+      <span style={{color:"#C9A84C",fontSize:18,fontWeight:700}}>→</span>
+    </a>)}
+    <button onClick={()=>onNav("chat","Build me a perfect daytime itinerary in Stockholm starting from Slussen. Include museum recommendations, a lunch spot, and one hidden gem.")} className="gold-btn" style={{width:"100%",borderRadius:16,padding:17,fontSize:14,fontWeight:800,marginTop:8}}>
+      🗓️ Build my perfect day with AI →
+    </button>
+  </div>;
+}
+
+// ─── NIGHTLIFE ─────────────────────────────────────────
+function Nightlife({onNav}){
+  const options=[
+    {name:"VIP Pub Crawl Stockholm",desc:"Meet other travellers, skip queues, visit 4-5 bars in one night. One of Stockholm's most popular social experiences.",price:"From ~350 SEK",url:"https://gyg.me/xqrK5hiJ",emoji:"🍻",color:"#8E44AD"},
+    {name:"Reserve Fine Dining",desc:"Stockholm has world-class restaurants. Book in advance — the best spots fill up fast especially on weekends.",price:"Varies",url:"https://www.thefork.com/restaurants/stockholm-c415144",emoji:"🍷",color:"#C0392B"},
+    {name:"Fotografiska Museum",desc:"Stunning photography museum open until 11pm. Has a great bar and restaurant — perfect evening out.",price:"~195 SEK entry",url:"https://www.fotografiska.com/sto/en/",emoji:"📷",color:"#2C3E50"},
+    {name:"Nightlife Tours",desc:"Guided nightlife experiences — local guide takes you to the best spots, no planning needed.",price:"From ~400 SEK",url:"https://gyg.me/xqrK5hiJ",emoji:"🎉",color:"#E74C3C"},
+    {name:"Gondolen Bar",desc:"Suspended over Stockholm — go for a drink, stay for the view. No reservation needed for bar seating.",price:"Bar prices from ~120 SEK",url:"https://www.gondolen.se/",emoji:"🌃",color:"#C9A84C"},
+  ];
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Stockholm Nightlife</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:24,fontWeight:500}}>The best of Stockholm after dark</div>
+    {options.map((p,i)=><a key={i} href={p.url} target="_blank" rel="noreferrer" className="link-card" style={{display:"flex",alignItems:"center",gap:14,background:"#fff",borderRadius:18,padding:"18px 20px",marginBottom:12,textDecoration:"none",boxShadow:"0 2px 16px rgba(0,0,0,0.08)",borderLeft:`4px solid ${p.color}`}}>
+      <div style={{width:48,height:48,borderRadius:14,background:p.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{p.emoji}</div>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:700,color:"#0D1B2A",marginBottom:3}}>{p.name}</div>
+        <div style={{fontSize:12,color:"#8A9BB0",marginBottom:4,lineHeight:1.4}}>{p.desc}</div>
+        <div style={{fontSize:12,fontWeight:700,color:p.color}}>{p.price}</div>
+      </div>
+      <span style={{color:"#C9A84C",fontSize:18,fontWeight:700}}>→</span>
+    </a>)}
+    <button onClick={()=>onNav("chat","What are the best nightlife options in Stockholm tonight? I want a mix of bars, clubs and unique experiences near Södermalm.")} className="navy-btn" style={{width:"100%",borderRadius:16,padding:17,fontSize:14,fontWeight:800,marginTop:8}}>
+      🌙 Ask AI for tonight's best spots →
+    </button>
+  </div>;
+}
+
 // ─── APP ──────────────────────────────────────────────
 function App(){
   const [screen,setScreen]=useState("home");
@@ -595,7 +675,8 @@ function App(){
   const titles={
     chat:"Ask Local AI 💬",transport:"Getting Around 🚇",food:"Food & Drinks 🍕",
     todo:"Things To Do 📍",gems:"Hidden Gems 💎",emergency:"Emergency Help 🆘",
-    itinerary:"Build My Day 🗓️",links:"Useful Links 🔗",videos:"Video Guides ▶️"
+    itinerary:"Build My Day 🗓️",links:"Useful Links 🔗",videos:"Video Guides ▶️",
+    daytime:"Daytime Stockholm ☀️",nightlife:"Stockholm Nightlife 🌙"
   };
 
   return <div style={{fontFamily:"'DM Sans',sans-serif",background:"#F7F4EF",minHeight:"100vh",fontSize:large?"110%":"100%"}}>
@@ -618,6 +699,8 @@ function App(){
     {screen==="itinerary"&&<Itinerary onNav={nav}/>}
     {screen==="links"&&<LinksScreen/>}
     {screen==="videos"&&<VideosScreen/>}
+    {screen==="daytime"&&<Daytime onNav={nav}/>}
+    {screen==="nightlife"&&<Nightlife onNav={nav}/>}
 
     {/* Bottom Nav */}
     <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"#fff",borderTop:"1px solid #EAE4D8",display:"flex",padding:"8px 0 14px",boxShadow:"0 -4px 24px rgba(0,0,0,0.09)",zIndex:100}}>
