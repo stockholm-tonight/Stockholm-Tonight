@@ -54,6 +54,14 @@ textarea:focus,input:focus{outline:none}
 .link-card{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:15px 18px;margin-bottom:10px;text-decoration:none;box-shadow:0 2px 14px rgba(0,0,0,0.06);transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1)}
 .link-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,0.12)}
 </style>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V4KZ5M47YG"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-V4KZ5M47YG');
+</script>
 </head>
 <body>
 <div id="root"></div>
@@ -61,6 +69,33 @@ textarea:focus,input:focus{outline:none}
 const {useState,useEffect,useRef} = React;
 
 const LINKTREE = "https://linktr.ee/stockholmwalkthrough";
+
+// GetYourGuide affiliate tours
+const GYG_TOURS = [
+  {name:"Stockholm Walking Tour",emoji:"🚶",url:"https://gyg.me/FSrWg1Ru",tag:"Popular"},
+  {name:"Archipelago Boat Tour",emoji:"⛵",url:"https://gyg.me/xAoX7Dl4",tag:"Popular"},
+  {name:"Top Highlights Bike Tour",emoji:"🚲",url:"https://gyg.me/qXNKtEmF",tag:"Active"},
+  {name:"Fotografiska Entry Ticket",emoji:"📷",url:"https://gyg.me/qI8YRBjv",tag:"Culture"},
+  {name:"Golf Cart Private Tour",emoji:"🏌️",url:"https://gyg.me/98pTAwQ6",tag:"Unique"},
+  {name:"Self-Guided Kayak Tour",emoji:"🛶",url:"https://gyg.me/fL9X5TYc",tag:"Active"},
+  {name:"Royal Palace Skip-the-Line",emoji:"👑",url:"https://gyg.me/LfGOneEC",tag:"Popular"},
+  {name:"Fjäderholmarna Boat Tour",emoji:"🏝️",url:"https://gyg.me/GvwugCHJ",tag:"Nature"},
+  {name:"VIP Nightlife 2-3 Clubs",emoji:"🎉",url:"https://gyg.me/2P0cv1e7",tag:"Nightlife"},
+  {name:"City Cruise with Pizza",emoji:"🍕",url:"https://gyg.me/RohA1tOd",tag:"Food"},
+  {name:"Hop-On Hop-Off Bus & Boat",emoji:"🚌",url:"https://gyg.me/RXOHk0p2",tag:"Popular"},
+  {name:"Arlanda Airport Train Transfer",emoji:"🚄",url:"https://gyg.me/JehKNmly",tag:"Transport"},
+  {name:"Electric Boat Sightseeing",emoji:"⚡",url:"https://gyg.me/zdElekye",tag:"Eco"},
+  {name:"Skyview Glass Gondola Ride",emoji:"🌆",url:"https://gyg.me/ZvVzPhJf",tag:"Unique"},
+  {name:"Helicopter Tour",emoji:"🚁",url:"https://gyg.me/bXV4L32m",tag:"Luxury"},
+  {name:"Swedish Food Walking Tour",emoji:"🥐",url:"https://gyg.me/Ull4B2Ad",tag:"Food"},
+  {name:"Evening Dining Experience",emoji:"🍷",url:"https://gyg.me/ySbE3nP7",tag:"Dining"},
+  {name:"ABBA Museum Entry",emoji:"🎤",url:"https://gyg.me/rcW3McxV",tag:"Culture"},
+  {name:"Nature Hiking with Campfire",emoji:"🔥",url:"https://gyg.me/04JedauV",tag:"Nature"},
+  {name:"Nightlife Old Town Bar Tour",emoji:"🍻",url:"https://gyg.me/hQHCHiTF",tag:"Nightlife"},
+  {name:"Viking Museum Entry",emoji:"⚔️",url:"https://affiliate.klook.com/sl/6hLoiO7",tag:"Culture"},
+  {name:"Avicii Arena Events",emoji:"🎵",url:"https://affiliate.klook.com/sl/2bqRFrY",tag:"Culture"},
+  {name:"Stockholm All-Inclusive Pass",emoji:"🏆",url:"https://affiliate.klook.com/sl/1holRyn",tag:"Popular"},
+];
 
 const GEMS = [
   {emoji:"🍺",title:"Södra Bar",desc:"Rooftop bar with a stunning city view and zero tourists. Enter via Mosebacke Torg — locals' best kept secret.",tag:"Nightlife"},
@@ -102,7 +137,7 @@ const LINKS = [
   {
     category:"🚕 Getting Around",
     items:[
-      {name:"Uber Stockholm",desc:"Book a ride — reliable and cashless",url:"https://www.uber.com/se/en/",color:"#000",emoji:"⚫"},
+      {name:"Uber Stockholm",desc:"Book a ride — reliable and cashless",url:"https://www.uber.com/invite/ttbbm8kgxcbh",color:"#000",emoji:"⚫"},
       {name:"Bolt Stockholm",desc:"Often cheaper than Uber — same quality",url:"https://bolt.eu/en-se/cities/stockholm/",color:"#34D186",emoji:"🟢"},
       {name:"Taxi Stockholm",desc:"Official Stockholm taxi company",url:"https://www.taxistockholm.se/en/",color:"#F0C040",emoji:"🟡"},
       {name:"SL Journey Planner",desc:"Plan any metro, bus, tram or ferry route",url:"https://sl.se/en",color:"#005B99",emoji:"🔵"},
@@ -125,7 +160,7 @@ const LINKS = [
   {
     category:"🎟️ Activities & Tickets",
     items:[
-      {name:"Stockholm Pass (GoCity)",desc:"All-inclusive pass — 60+ attractions, skip queues, save money",url:"https://gocity.com/stockholm/en-us",color:"#E74C3C",emoji:"🏆"},
+      {name:"Stockholm Pass (GoCity)",desc:"All-inclusive pass — 60+ attractions, skip queues, save money",url:"https://affiliate.klook.com/sl/1holRyn",color:"#E74C3C",emoji:"🏆"},
       {name:"Viator Stockholm",desc:"Skip-the-line tickets and guided tours",url:"https://www.viator.com/Stockholm/d976-ttd",color:"#1A1A2E",emoji:"🎫"},
       {name:"ABBA Museum",desc:"Book in advance — often sells out",url:"https://www.abbathemuseum.com/en/",color:"#D4AC0D",emoji:"🎤"},
       {name:"Vasa Museum",desc:"World's best preserved 17th century warship",url:"https://www.vasamuseet.se/en",color:"#8B4513",emoji:"⚓"},
@@ -142,10 +177,20 @@ const LINKS = [
   {
     category:"🏨 Where to Stay",
     items:[
+      {name:"Comfort Hotel Stockholm Central",desc:"Centrally located — 7 min walk from Drottninggatan, near City Hall",url:"https://affiliate.klook.com/sl/2kDEIKD",color:"#D4001A",emoji:"🏨"},
+      {name:"Generator Stockholm",desc:"Stylish hotel — 5 min drive from Odenplan, close to Stockholm Palace",url:"https://affiliate.klook.com/sl/1rux7G1",color:"#2C3E50",emoji:"🏩"},
       {name:"Scandic Hotels Stockholm",desc:"Sweden's biggest hotel chain — reliable and comfortable",url:"https://www.scandichotels.com/hotels/sweden/stockholm",color:"#D4001A",emoji:"🏨"},
       {name:"Strawberry Hotels",desc:"Stylish Nordic hotels — great locations in Stockholm",url:"https://www.strawberry.se/hotell/sverige/stockholm/",color:"#FF6B9D",emoji:"🍓"},
       {name:"Vrbo Stockholm",desc:"Private apartments — ideal for families and longer stays",url:"https://www.vrbo.com/vacation-rentals/europe/sweden/stockholm",color:"#3D5A80",emoji:"🏠"},
-      {name:"Airalo eSIM",desc:"Swedish data SIM — works instantly on your phone on arrival",url:"https://www.airalo.com/sweden-esim",color:"#6C5CE7",emoji:"📱"},
+      {name:"Airalo eSIM",desc:"Swedish data SIM — works instantly on your phone on arrival",url:"https://www.airalo.com/refer-a-friend?referral_code=MATTHE66203",color:"#6C5CE7",emoji:"📱"},
+    ]
+  },
+  {
+    category:"🎡 Attractions & Tickets",
+    items:[
+      {name:"Stockholm All-Inclusive Pass",desc:"60+ attractions included — best value for sightseers",url:"https://affiliate.klook.com/sl/1holRyn",color:"#E74C3C",emoji:"🏆"},
+      {name:"Viking Museum Stockholm",desc:"Immersive Viking history experience — unique to Stockholm",url:"https://affiliate.klook.com/sl/6hLoiO7",color:"#8B4513",emoji:"⚔️"},
+      {name:"Avicii Arena Tickets",desc:"World-class events venue — check what's on during your visit",url:"https://affiliate.klook.com/sl/2bqRFrY",color:"#1DB954",emoji:"🎵"},
     ]
   },
 ];
@@ -242,6 +287,9 @@ function Home({onNav,location}){
           🌙 Nightlife Guide
         </button>
       </div>
+      <button onClick={()=>onNav("tours")} className="gold-btn" style={{width:"100%",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
+        🎟️ Book Tours & Experiences
+      </button>
       <button onClick={()=>onNav("links")} style={{width:"100%",background:"#fff",border:"2px solid #C9A84C",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:"#0D1B2A",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(201,168,76,0.15)"}}>
         🔗 Useful Stockholm Links & Apps
       </button>
@@ -589,7 +637,7 @@ function Itinerary({onNav}){
 // ─── DAYTIME ──────────────────────────────────────────
 function Daytime({onNav}){
   const passes=[
-    {name:"Stockholm Pass (GoCity)",desc:"60+ attractions included — Vasa Museum, ABBA Museum, boat tours, hop-on bus. Huge savings if you visit multiple sites.",price:"From ~650 SEK/day",url:"https://gocity.com/stockholm/en-us",emoji:"🏆",color:"#E74C3C"},
+    {name:"Stockholm Pass (GoCity)",desc:"60+ attractions included — Vasa Museum, ABBA Museum, boat tours, hop-on bus. Huge savings if you visit multiple sites.",price:"From ~650 SEK/day",url:"https://affiliate.klook.com/sl/1holRyn",emoji:"🏆",color:"#E74C3C"},
     {name:"Arlanda Express",desc:"Fastest way from airport to city — 20 minutes, no stress, no stops.",price:"~310 SEK one way",url:"https://www.arlandaexpress.com/",emoji:"🚄",color:"#005B99"},
     {name:"Book Breakfast & Lunch",desc:"Reserve a table at Stockholm's best spots — instant confirmation, free cancellation.",price:"Varies",url:"https://www.thefork.com/restaurants/stockholm-c415144",emoji:"🥐",color:"#F39C12"},
     {name:"Bike the City",desc:"City bikes available across Stockholm April–October. Perfect for Djurgården loop.",price:"165 SEK / 3 days",url:"https://citybikes.se/",emoji:"🚲",color:"#27AE60"},
@@ -640,6 +688,35 @@ function Nightlife({onNav}){
   </div>;
 }
 
+// ─── TOURS ────────────────────────────────────────────
+function Tours(){
+  const tags=["All","Popular","Culture","Food","Nature","Nightlife","Active","Unique","Luxury","Transport","Eco","Dining"];
+  const [tag,setTag]=useState("All");
+  const filtered=tag==="All"?GYG_TOURS:GYG_TOURS.filter(t=>t.tag===tag);
+  const tagColors={Popular:"#E74C3C",Culture:"#8E44AD",Food:"#F39C12",Nature:"#27AE60",
+    Nightlife:"#2C3E50",Active:"#3498DB",Unique:"#E67E22",Luxury:"#C9A84C",
+    Transport:"#005B99",Eco:"#1ABC9C",Dining:"#C0392B",All:"#0D1B2A"};
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Book Tours & Experiences 🎟️</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:16,fontWeight:500}}>Handpicked Stockholm experiences — skip the queue, instant confirmation</div>
+    <div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:20,paddingBottom:4}}>
+      {tags.map(t=><button key={t} onClick={()=>setTag(t)} className="pill" style={{background:tag===t?tagColors[t]||"#0D1B2A":"#fff",color:tag===t?"#fff":"#0D1B2A",border:`1.5px solid ${tag===t?tagColors[t]||"#0D1B2A":"#EAE4D8"}`,padding:"8px 16px",fontSize:12,whiteSpace:"nowrap",flexShrink:0}}>{t}</button>)}
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
+      {filtered.map((t,i)=><a key={i} href={t.url} target="_blank" rel="noreferrer" style={{background:"#fff",borderRadius:16,padding:"16px 14px",textDecoration:"none",boxShadow:"0 2px 14px rgba(0,0,0,0.07)",display:"flex",flexDirection:"column",gap:8,transition:"transform 0.15s",borderTop:`3px solid ${tagColors[t.tag]||"#C9A84C"}`}}
+        onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
+        onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
+        <span style={{fontSize:26}}>{t.emoji}</span>
+        <div style={{fontSize:12.5,fontWeight:700,color:"#0D1B2A",lineHeight:1.3}}>{t.name}</div>
+        <div style={{fontSize:10,background:tagColors[t.tag]||"#C9A84C",color:"#fff",borderRadius:50,padding:"2px 8px",fontWeight:700,alignSelf:"flex-start"}}>{t.tag}</div>
+      </a>)}
+    </div>
+    <a href="https://gyg.me/xqrK5hiJ" target="_blank" rel="noreferrer" className="gold-btn" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,borderRadius:16,padding:17,fontSize:14,fontWeight:800,textDecoration:"none"}}>
+      🎯 See All Stockholm Experiences →
+    </a>
+  </div>;
+}
+
 // ─── APP ──────────────────────────────────────────────
 function App(){
   const [screen,setScreen]=useState("home");
@@ -667,8 +744,8 @@ function App(){
   const navItems=[
     {id:"home",emoji:"🏠",label:"Home"},
     {id:"chat",emoji:"💬",label:"Ask AI"},
+    {id:"tours",emoji:"🎟️",label:"Tours"},
     {id:"links",emoji:"🔗",label:"Links"},
-    {id:"videos",emoji:"▶️",label:"Videos"},
     {id:"emergency",emoji:"🆘",label:"Help"},
   ];
 
@@ -676,7 +753,7 @@ function App(){
     chat:"Ask Local AI 💬",transport:"Getting Around 🚇",food:"Food & Drinks 🍕",
     todo:"Things To Do 📍",gems:"Hidden Gems 💎",emergency:"Emergency Help 🆘",
     itinerary:"Build My Day 🗓️",links:"Useful Links 🔗",videos:"Video Guides ▶️",
-    daytime:"Daytime Stockholm ☀️",nightlife:"Stockholm Nightlife 🌙"
+    daytime:"Daytime Stockholm ☀️",nightlife:"Stockholm Nightlife 🌙",tours:"Book Experiences 🎟️"
   };
 
   return <div style={{fontFamily:"'DM Sans',sans-serif",background:"#F7F4EF",minHeight:"100vh",fontSize:large?"110%":"100%"}}>
@@ -699,6 +776,7 @@ function App(){
     {screen==="itinerary"&&<Itinerary onNav={nav}/>}
     {screen==="links"&&<LinksScreen/>}
     {screen==="videos"&&<VideosScreen/>}
+    {screen==="tours"&&<Tours/>}
     {screen==="daytime"&&<Daytime onNav={nav}/>}
     {screen==="nightlife"&&<Nightlife onNav={nav}/>}
 
