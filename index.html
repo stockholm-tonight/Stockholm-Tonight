@@ -290,6 +290,9 @@ function Home({onNav,location}){
       <button onClick={()=>onNav("tours")} className="gold-btn" style={{width:"100%",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
         🎟️ Book Tours & Experiences
       </button>
+      <button onClick={()=>onNav("faq")} style={{width:"100%",background:"#fff",border:"2px solid #27AE60",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:"#0D1B2A",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(39,174,96,0.15)"}}>
+        💡 Good To Know — Sweden Tips & FAQ
+      </button>
       <button onClick={()=>onNav("links")} style={{width:"100%",background:"#fff",border:"2px solid #C9A84C",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:"#0D1B2A",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(201,168,76,0.15)"}}>
         🔗 Useful Stockholm Links & Apps
       </button>
@@ -717,6 +720,63 @@ function Tours(){
   </div>;
 }
 
+// ─── FAQ ──────────────────────────────────────────────
+function FAQ(){
+  const [open,setOpen]=useState(null);
+  const faqs=[
+    {q:"Can I use euros or dollars in Stockholm?",a:"No — Sweden uses Swedish Krona (SEK). But don't worry about getting cash — cards are accepted virtually everywhere in Stockholm, including small cafés, market stalls, taxis and buses. Sweden is one of the most cashless countries in the world."},
+    {q:"Where can I buy alcohol?",a:"ONLY at Systembolaget — the government-run alcohol store. You CANNOT buy alcohol at 7-Eleven, Pressbyrån, supermarkets or any convenience store. Systembolaget is open weekdays until around 7-8pm, Saturdays until 3pm, and CLOSED on Sundays. Bars and restaurants serve alcohol until 1-3am depending on their license."},
+    {q:"Is Stockholm safe?",a:"Yes — Stockholm is very safe. Normal city precautions apply. Watch for pickpockets in busy Gamla Stan tourist areas. The metro and streets are safe at night. Emergency number is 112."},
+    {q:"Do I need to tip?",a:"No obligation at all. Service charge is included in Swedish prices by law. If you want to tip, simply round up the bill — that's perfectly appreciated. Never feel pressured to tip."},
+    {q:"Does everyone speak English?",a:"Yes — virtually everyone in Stockholm speaks excellent English. You will have absolutely no language problems anywhere in the city, including in shops, restaurants, and public transport."},
+    {q:"Is tap water safe to drink?",a:"Yes — Stockholm tap water is among the cleanest and best tasting in the world. You never need to buy bottled water. Just ask for tap water in any restaurant — it's free."},
+    {q:"How do I get from Arlanda Airport to the city?",a:"Three options: Arlanda Express train (fastest — 20 min, ~310 SEK, book online for 30% discount), SL commuter train + bus (cheapest — ~100 SEK, ~60 min), or taxi (500-775 SEK fixed price — always confirm price before getting in). Bolt and Uber also work from the airport."},
+    {q:"What is the SL card and how does it work?",a:"SL is Stockholm's public transport system covering metro, buses, trams and ferries. Buy a card at any Pressbyrån, 7-Eleven or ticket machine. Single ticket: 43 SEK. 24hr pass: 180 SEK. 72hr pass: 360 SEK. Always tap both IN and OUT at the metro gates or you may be fined."},
+    {q:"What neighbourhood should I stay in?",a:"Södermalm for trendy local feel and great nightlife. Gamla Stan for historic charm and tourist atmosphere. Östermalm for upscale luxury. Vasastan for quiet and residential. Norrmalm for central business location near main shopping."},
+    {q:"When do shops and museums close?",a:"Most shops open 10am-7pm, malls until 8-9pm. Museum hours vary — always check their website as Monday closures are common. Systembolaget (alcohol) closes around 7-8pm weekdays, 3pm Saturdays, closed Sundays. Most restaurants stop taking orders by 10-11pm."},
+    {q:"Can I use my EU health card in Sweden?",a:"Yes — EU/EEA citizens can use their European Health Insurance Card (EHIC) for emergency healthcare. Non-EU visitors can access emergency care but may be charged. Travel insurance is always recommended."},
+    {q:"What are the best free things to do?",a:"Monteliusvägen viewpoint (best free view in the city), walk Gamla Stan's medieval streets, Moderna Museet (free entry), Djurgården park, Tantolunden park in Södermalm, and all of Stockholm's beautiful waterfront areas are completely free to enjoy."},
+  ];
+  return <div style={{padding:"20px 16px 100px"}}>
+    <div className="serif" style={{fontSize:26,fontWeight:900,color:"#0D1B2A",marginBottom:4}}>Good To Know 💡</div>
+    <div style={{fontSize:14,color:"#8A9BB0",marginBottom:16,fontWeight:500}}>Essential Stockholm facts every visitor needs</div>
+    
+    {/* Quick facts strip */}
+    <div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:20,paddingBottom:4}}>
+      {[
+        {emoji:"💳",text:"Cashless country"},
+        {emoji:"🚫",text:"No alcohol in shops"},
+        {emoji:"🌊",text:"Safe tap water"},
+        {emoji:"🇬🇧",text:"Everyone speaks English"},
+        {emoji:"🚨",text:"Emergency: 112"},
+        {emoji:"💊",text:"24hr pharmacy"},
+      ].map((f,i)=><div key={i} style={{background:"#fff",borderRadius:12,padding:"10px 14px",flexShrink:0,textAlign:"center",boxShadow:"0 2px 10px rgba(0,0,0,0.06)"}}>
+        <div style={{fontSize:20,marginBottom:4}}>{f.emoji}</div>
+        <div style={{fontSize:11,fontWeight:700,color:"#0D1B2A",whiteSpace:"nowrap"}}>{f.text}</div>
+      </div>)}
+    </div>
+
+    {/* FAQ accordion */}
+    {faqs.map((f,i)=><div key={i} onClick={()=>setOpen(open===i?null:i)} style={{background:"#fff",borderRadius:16,padding:"16px 18px",marginBottom:10,cursor:"pointer",boxShadow:"0 2px 12px rgba(0,0,0,0.06)",border:`1.5px solid ${open===i?"#C9A84C":"transparent"}`}}>
+      <div style={{display:"flex",alignItems:"center",gap:12}}>
+        <div style={{flex:1,fontSize:14,fontWeight:700,color:"#0D1B2A",lineHeight:1.4}}>{f.q}</div>
+        <div style={{width:26,height:26,borderRadius:"50%",background:"#F7F4EF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"#8A9BB0",flexShrink:0}}>{open===i?"▲":"▼"}</div>
+      </div>
+      {open===i&&<div style={{marginTop:12,paddingTop:12,borderTop:"1px solid #F0EBE0",fontSize:13.5,color:"#444",lineHeight:1.7}}>{f.a}</div>}
+    </div>)}
+
+    {/* Visit Stockholm link */}
+    <a href="https://www.visitstockholm.com/en/" target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:14,background:"linear-gradient(135deg,#005B99,#003d6b)",borderRadius:16,padding:"16px 20px",textDecoration:"none",marginTop:8}}>
+      <span style={{fontSize:24}}>🏙️</span>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:700,color:"#fff",marginBottom:2}}>Visit Stockholm — Official Guide</div>
+        <div style={{fontSize:12,color:"rgba(255,255,255,0.75)"}}>Current events, exhibitions & verified info →</div>
+      </div>
+      <span style={{color:"rgba(255,255,255,0.6)",fontSize:18}}>→</span>
+    </a>
+  </div>;
+}
+
 // ─── APP ──────────────────────────────────────────────
 function App(){
   const [screen,setScreen]=useState("home");
@@ -745,7 +805,7 @@ function App(){
     {id:"home",emoji:"🏠",label:"Home"},
     {id:"chat",emoji:"💬",label:"Ask AI"},
     {id:"tours",emoji:"🎟️",label:"Tours"},
-    {id:"links",emoji:"🔗",label:"Links"},
+    {id:"faq",emoji:"💡",label:"FAQ"},
     {id:"emergency",emoji:"🆘",label:"Help"},
   ];
 
@@ -753,7 +813,7 @@ function App(){
     chat:"Ask Local AI 💬",transport:"Getting Around 🚇",food:"Food & Drinks 🍕",
     todo:"Things To Do 📍",gems:"Hidden Gems 💎",emergency:"Emergency Help 🆘",
     itinerary:"Build My Day 🗓️",links:"Useful Links 🔗",videos:"Video Guides ▶️",
-    daytime:"Daytime Stockholm ☀️",nightlife:"Stockholm Nightlife 🌙",tours:"Book Experiences 🎟️"
+    daytime:"Daytime Stockholm ☀️",nightlife:"Stockholm Nightlife 🌙",tours:"Book Experiences 🎟️",faq:"Good To Know 💡"
   };
 
   return <div style={{fontFamily:"'DM Sans',sans-serif",background:"#F7F4EF",minHeight:"100vh",fontSize:large?"110%":"100%"}}>
@@ -777,6 +837,7 @@ function App(){
     {screen==="links"&&<LinksScreen/>}
     {screen==="videos"&&<VideosScreen/>}
     {screen==="tours"&&<Tours/>}
+    {screen==="faq"&&<FAQ/>}
     {screen==="daytime"&&<Daytime onNav={nav}/>}
     {screen==="nightlife"&&<Nightlife onNav={nav}/>}
 
