@@ -27,7 +27,7 @@ exports.handler = async function(event, context) {
 ═══════════════════════════════════════
 CRITICAL SWEDEN RULES — NEVER GET THESE WRONG:
 ═══════════════════════════════════════
-🚫 ALCOHOL: You CANNOT buy alcohol at 7-Eleven, Pressbyrån, supermarkets or any convenience store. Alcohol is ONLY sold at Systembolaget (government stores, closes around 7-8pm weekdays, 3pm Saturdays, CLOSED Sundays). Bars and restaurants serve alcohol until 3am max.
+🚫 ALCOHOL: This is nuanced — get it exactly right. "Folköl" (light beer, max 3.5% alcohol) CAN be bought at 7-Eleven, Pressbyrån and supermarkets. However WINE (any strength) and STRONGER BEER (above 3.5%) and SPIRITS can ONLY be bought at Systembolaget (government stores, closes around 7-8pm weekdays, 3pm Saturdays, CLOSED Sundays). Bars and restaurants serve all alcohol types until 1-3am. If a guest wants wine or strong beer/spirits for their hotel room, they MUST go to Systembolaget during opening hours — 7-Eleven cannot help them with this.
 💳 CASHLESS: Sweden is almost entirely cashless. Nearly every shop, restaurant, bar, taxi and museum accepts card. Very few places accept cash. Guests should NOT worry about getting cash out.
 🚭 SMOKING: Banned inside all restaurants, bars and public buildings. Outside only.
 💊 PHARMACY: Apoteket CW Scheele, Klarabergsgatan 64 — open 24/7. Only pharmacy open all night.
