@@ -3,11 +3,18 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Stockholm Tonight — Your Free Local Guide 🇸🇪</title>
-<meta name="description" content="Free AI-powered Stockholm guide. Food, transport, hidden gems, itineraries. Works in any language, 24/7."/>
-<meta property="og:title" content="Stockholm Tonight 🇸🇪"/>
-<meta property="og:description" content="Free local Stockholm guide — AI chat, hidden gems, transport, food. Made by a night receptionist at Slussen."/>
+<title>Stockholm Tonight — Free AI Travel Guide for Stockholm, Sweden 🇸🇪</title>
+<meta name="description" content="Stockholm Tonight is the free AI-powered local guide for Stockholm, Sweden. Get instant answers on food, transport, nightlife, hidden gems and book tours — all in any language, 24/7."/>
+<meta name="keywords" content="Stockholm Tonight, Stockholm guide, Stockholm travel, Stockholm tourist app, things to do in Stockholm, Stockholm nightlife, Stockholm tours"/>
+<meta property="og:title" content="Stockholm Tonight — Free AI Travel Guide 🇸🇪"/>
+<meta property="og:description" content="The free local Stockholm guide — AI chat, hidden gems, transport, food, tours. Made by a Stockholm night receptionist."/>
+<meta property="og:url" content="https://stockholmtonight.com/"/>
+<meta property="og:type" content="website"/>
+<link rel="canonical" href="https://stockholmtonight.com/"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="dns-prefetch" href="https://img.youtube.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -221,9 +228,13 @@ function Logo(){
 }
 
 // ─── HOME ──────────────────────────────────────────────
-function Home({onNav,location}){
+function Home({onNav,location,dark,setDark}){
   const h=new Date().getHours();
   const greeting=h<5?"Still up? 🌙":h<12?"Good morning ☀️":h<18?"Good afternoon 👋":"Good evening 🌆";
+  const cardBg=dark?"#1C2A38":"#fff";
+  const textPrimary=dark?"#F0EBE0":"#0D1B2A";
+  const textMuted=dark?"#8FA0B0":"#8A9BB0";
+  const chipBorder=dark?"1.5px solid #2A3A4A":"1.5px solid #EAE4D8";
 
   const btns=[
     {id:"food",emoji:"🍕",label:"Food & Drinks",sub:"Open right now"},
@@ -242,7 +253,10 @@ function Home({onNav,location}){
       <div style={{position:"absolute",bottom:-40,left:-20,width:160,height:160,borderRadius:"50%",background:"rgba(255,255,255,0.04)",pointerEvents:"none"}}/>
       <div style={{position:"absolute",top:40,right:30,width:80,height:80,borderRadius:"50%",background:"rgba(201,168,76,0.06)",pointerEvents:"none"}}/>
 
-      <Logo/>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <Logo/>
+        <button onClick={()=>setDark(p=>!p)} aria-label="Toggle dark mode" style={{background:"rgba(255,255,255,0.12)",border:"none",borderRadius:50,width:38,height:38,fontSize:17,cursor:"pointer",flexShrink:0}}>{dark?"☀️":"🌙"}</button>
+      </div>
       <div className="serif fade-up" style={{fontSize:32,fontWeight:900,color:"#fff",lineHeight:1.1,margin:"18px 0 6px",letterSpacing:"-0.5px"}}>
         {greeting}
       </div>
@@ -257,10 +271,10 @@ function Home({onNav,location}){
 
     {/* Quick questions */}
     <div style={{padding:"20px 20px 4px"}}>
-      <div style={{fontSize:10,color:"#8A9BB0",fontWeight:700,letterSpacing:3,textTransform:"uppercase",marginBottom:12}}>Quick Questions</div>
+      <div style={{fontSize:10,color:textMuted,fontWeight:700,letterSpacing:3,textTransform:"uppercase",marginBottom:12}}>Quick Questions</div>
       <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:6}}>
         {["What's open now? 🕐","Best fika? ☕","Gamla Stan? 🗺️","Late night food? 🌙","Free things? 🎯"].map(q=>
-          <button key={q} onClick={()=>onNav("chat",q)} className="pill" style={{background:"#fff",border:"1.5px solid #EAE4D8",padding:"10px 16px",fontSize:12.5,color:"#0D1B2A",whiteSpace:"nowrap",flexShrink:0,boxShadow:"0 2px 10px rgba(0,0,0,0.06)"}}>{q}</button>
+          <button key={q} onClick={()=>onNav("chat",q)} className="pill" style={{background:cardBg,border:chipBorder,padding:"10px 16px",fontSize:12.5,color:textPrimary,whiteSpace:"nowrap",flexShrink:0,boxShadow:"0 2px 10px rgba(0,0,0,0.06)"}}>{q}</button>
         )}
       </div>
     </div>
@@ -269,10 +283,10 @@ function Home({onNav,location}){
     <div style={{padding:"14px 16px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
       {btns.map((b,i)=>{
         const accents=["#C0392B","#1A6B9A","#27AE60","#C0392B","#8E44AD","#C9A84C"];
-        return <button key={b.id} onClick={()=>onNav(b.id)} className="card" style={{border:"none",borderRadius:20,padding:"20px 16px",textAlign:"left",cursor:"pointer",position:"relative",overflow:"hidden",borderTop:`3px solid ${accents[i]}`}}>
+        return <button key={b.id} onClick={()=>onNav(b.id)} style={{border:"none",borderRadius:20,padding:"20px 16px",textAlign:"left",cursor:"pointer",position:"relative",overflow:"hidden",borderTop:`3px solid ${accents[i]}`,background:cardBg,boxShadow:"0 2px 16px rgba(0,0,0,0.07)"}}>
           <div style={{fontSize:28,marginBottom:10}}>{b.emoji}</div>
-          <div style={{fontSize:14,fontWeight:700,color:"#0D1B2A",marginBottom:3,lineHeight:1.2}}>{b.label}</div>
-          <div style={{fontSize:11.5,color:"#8A9BB0",fontWeight:500}}>{b.sub}</div>
+          <div style={{fontSize:14,fontWeight:700,color:textPrimary,marginBottom:3,lineHeight:1.2}}>{b.label}</div>
+          <div style={{fontSize:11.5,color:textMuted,fontWeight:500}}>{b.sub}</div>
         </button>;
       })}
     </div>
@@ -290,13 +304,13 @@ function Home({onNav,location}){
       <button onClick={()=>onNav("tours")} className="gold-btn" style={{width:"100%",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
         🎟️ Book Tours & Experiences
       </button>
-      <button onClick={()=>onNav("faq")} style={{width:"100%",background:"#fff",border:"2px solid #27AE60",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:"#0D1B2A",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(39,174,96,0.15)"}}>
+      <button onClick={()=>onNav("faq")} style={{width:"100%",background:cardBg,border:"2px solid #27AE60",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:textPrimary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(39,174,96,0.15)"}}>
         💡 Good To Know — Sweden Tips & FAQ
       </button>
-      <button onClick={()=>onNav("links")} style={{width:"100%",background:"#fff",border:"2px solid #C9A84C",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:"#0D1B2A",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(201,168,76,0.15)"}}>
+      <button onClick={()=>onNav("links")} style={{width:"100%",background:cardBg,border:"2px solid #C9A84C",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:textPrimary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(201,168,76,0.15)"}}>
         🔗 Useful Stockholm Links & Apps
       </button>
-      <button onClick={()=>onNav("videos")} style={{width:"100%",background:"#fff",border:"2px solid #FF0000",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:"#0D1B2A",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(255,0,0,0.08)"}}>
+      <button onClick={()=>onNav("videos")} style={{width:"100%",background:cardBg,border:"2px solid #FF0000",borderRadius:16,padding:"16px 20px",fontSize:14,fontWeight:700,color:textPrimary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 2px 14px rgba(255,0,0,0.08)"}}>
         ▶️ Stockholm Video Guides
       </button>
       <button onClick={()=>{const g=GEMS[Math.floor(Math.random()*GEMS.length)];alert(`✨ Local Tip!\n\n${g.emoji} ${g.title}\n\n${g.desc}`);}} className="gold-btn" style={{width:"100%",borderRadius:16,padding:"17px",fontSize:15,fontWeight:800}}>
@@ -306,9 +320,7 @@ function Home({onNav,location}){
 
     {/* Share button */}
     <div style={{padding:"12px 16px 0",textAlign:"center"}}>
-      <button onClick={()=>{if(navigator.share){navigator.share({title:"Stockholm Tonight",text:"Free local Stockholm guide — AI chat, hidden gems, transport 🇸🇪",url:window.location.href});}else{navigator.clipboard.writeText(window.location.href);alert("Link copied! Share it with your travel companions 🇸🇪");}}} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:"#8A9BB0",fontWeight:600,padding:"8px 16px",borderRadius:50,transition:"color 0.2s"}}
-        onMouseEnter={e=>e.target.style.color="#0D1B2A"}
-        onMouseLeave={e=>e.target.style.color="#8A9BB0"}>
+      <button onClick={()=>{if(navigator.share){navigator.share({title:"Stockholm Tonight",text:"Free local Stockholm guide — AI chat, hidden gems, transport 🇸🇪",url:window.location.href});}else{navigator.clipboard.writeText(window.location.href);alert("Link copied! Share it with your travel companions 🇸🇪");}}} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:textMuted,fontWeight:600,padding:"8px 16px",borderRadius:50,transition:"color 0.2s"}}>
         📤 Share this guide with a friend
       </button>
     </div>
@@ -316,7 +328,7 @@ function Home({onNav,location}){
 }
 
 // ─── CHAT ─────────────────────────────────────────────
-function Chat({initMsg="",location}){
+function Chat({initMsg="",location,dark}){
   const [msgs,setMsgs]=useState([{role:"assistant",content:"Hej! 👋 I'm your Stockholm local guide — ask me anything in any language!\n\nFood, transport, hidden gems, what to do... I'm honest about what I know and what I don't. What do you need?"}]);
   const [input,setInput]=useState(initMsg);
   const [loading,setLoading]=useState(false);
@@ -359,15 +371,19 @@ function Chat({initMsg="",location}){
     r.start();
   };
 
-  return <div style={{display:"flex",flexDirection:"column",height:"calc(100vh - 112px)"}}>
+  const cardBg=dark?"#1C2A38":"#fff";
+  const textPrimary=dark?"#F0EBE0":"#0D1B2A";
+  const chipBorder=dark?"1.5px solid #2A3A4A":"1.5px solid #EAE4D8";
+
+  return <div style={{display:"flex",flexDirection:"column",height:"calc(100vh - 192px)"}}>
     <div style={{flex:1,overflowY:"auto",padding:"16px 14px 8px"}}>
       {msgs.map((m,i)=><div key={i} className="fade-up" style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",marginBottom:14,gap:10}}>
         {m.role==="assistant"&&<div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#0D1B2A,#1A3A5C)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0,marginTop:2,boxShadow:"0 2px 10px rgba(13,27,42,0.25)"}}>🇸🇪</div>}
-        <div style={{maxWidth:"76%",background:m.role==="user"?"linear-gradient(135deg,#0D1B2A,#1A3A5C)":"#fff",color:m.role==="user"?"#fff":"#0D1B2A",padding:"13px 16px",borderRadius:m.role==="user"?"18px 18px 4px 18px":"18px 18px 18px 4px",fontSize:14.5,lineHeight:1.65,boxShadow:"0 2px 16px rgba(0,0,0,0.08)",whiteSpace:"pre-wrap",fontWeight:m.role==="user"?500:400}}>{m.content}</div>
+        <div style={{maxWidth:"76%",background:m.role==="user"?"linear-gradient(135deg,#0D1B2A,#1A3A5C)":cardBg,color:m.role==="user"?"#fff":textPrimary,padding:"13px 16px",borderRadius:m.role==="user"?"18px 18px 4px 18px":"18px 18px 18px 4px",fontSize:14.5,lineHeight:1.65,boxShadow:"0 2px 16px rgba(0,0,0,0.08)",whiteSpace:"pre-wrap",fontWeight:m.role==="user"?500:400}}>{m.content}</div>
       </div>)}
       {loading&&<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
         <div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#0D1B2A,#1A3A5C)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,boxShadow:"0 2px 10px rgba(13,27,42,0.25)"}}>🇸🇪</div>
-        <div style={{background:"#fff",padding:"14px 20px",borderRadius:"18px 18px 18px 4px",boxShadow:"0 2px 16px rgba(0,0,0,0.08)"}}><Dots/></div>
+        <div style={{background:cardBg,padding:"14px 20px",borderRadius:"18px 18px 18px 4px",boxShadow:"0 2px 16px rgba(0,0,0,0.08)"}}><Dots/></div>
       </div>}
       <div ref={bottomRef}/>
     </div>
@@ -375,16 +391,16 @@ function Chat({initMsg="",location}){
     {/* Quick replies */}
     <div style={{padding:"8px 14px 0",display:"flex",gap:8,overflowX:"auto"}}>
       {["What's open now?","Dinner tonight?","Night bus routes?","Free museums?"].map(q=>
-        <button key={q} onClick={()=>send(q)} className="pill" style={{background:"#fff",border:"1.5px solid #EAE4D8",padding:"7px 14px",fontSize:12,color:"#0D1B2A",whiteSpace:"nowrap",flexShrink:0,boxShadow:"0 1px 8px rgba(0,0,0,0.05)"}}>{q}</button>
+        <button key={q} onClick={()=>send(q)} className="pill" style={{background:cardBg,border:chipBorder,padding:"7px 14px",fontSize:12,color:textPrimary,whiteSpace:"nowrap",flexShrink:0,boxShadow:"0 1px 8px rgba(0,0,0,0.05)"}}>{q}</button>
       )}
     </div>
 
     {/* Input */}
     <div style={{padding:"10px 14px 18px",display:"flex",gap:10,alignItems:"flex-end"}}>
-      <button onClick={mic} style={{width:46,height:46,borderRadius:"50%",flexShrink:0,background:"#fff",border:"1.5px solid #EAE4D8",fontSize:19,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 10px rgba(0,0,0,0.06)"}}>🎤</button>
+      <button onClick={mic} aria-label="Voice input" style={{width:46,height:46,borderRadius:"50%",flexShrink:0,background:cardBg,border:chipBorder,fontSize:19,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 10px rgba(0,0,0,0.06)"}}>🎤</button>
       <div style={{flex:1,position:"relative"}}>
-        <textarea ref={taRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}}} placeholder="Ask anything... in any language 🌍" rows={1} style={{width:"100%",borderRadius:24,border:"1.5px solid #EAE4D8",padding:"13px 50px 13px 18px",fontSize:14,fontFamily:"'DM Sans',sans-serif",resize:"none",lineHeight:1.4,boxSizing:"border-box",background:"#fff",boxShadow:"0 2px 14px rgba(0,0,0,0.07)",color:"#0D1B2A"}}/>
-        <button onClick={()=>send()} style={{position:"absolute",right:7,bottom:7,width:36,height:36,borderRadius:"50%",background:input.trim()?"linear-gradient(135deg,#0D1B2A,#1A3A5C)":"#E8E0D0",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,transition:"background 0.2s"}}>➤</button>
+        <textarea ref={taRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}}} placeholder="Ask anything... in any language 🌍" rows={1} style={{width:"100%",borderRadius:24,border:chipBorder,padding:"13px 56px 13px 18px",fontSize:14,fontFamily:"'DM Sans',sans-serif",resize:"none",lineHeight:1.4,boxSizing:"border-box",background:cardBg,boxShadow:"0 2px 14px rgba(0,0,0,0.07)",color:textPrimary}}/>
+        <button onClick={()=>send()} aria-label="Send message" style={{position:"absolute",right:6,bottom:6,width:42,height:42,borderRadius:"50%",background:input.trim()?"linear-gradient(135deg,#0D1B2A,#1A3A5C)":"#E8E0D0",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,transition:"background 0.2s"}}>➤</button>
       </div>
     </div>
   </div>;
@@ -725,7 +741,7 @@ function FAQ(){
   const [open,setOpen]=useState(null);
   const faqs=[
     {q:"Can I use euros or dollars in Stockholm?",a:"No — Sweden uses Swedish Krona (SEK). But don't worry about getting cash — cards are accepted virtually everywhere in Stockholm, including small cafés, market stalls, taxis and buses. Sweden is one of the most cashless countries in the world."},
-    {q:"Where can I buy alcohol?",a:"ONLY at Systembolaget — the government-run alcohol store. You CANNOT buy alcohol at 7-Eleven, Pressbyrån, supermarkets or any convenience store. Systembolaget is open weekdays until around 7-8pm, Saturdays until 3pm, and CLOSED on Sundays. Bars and restaurants serve alcohol until 1-3am depending on their license."},
+    {q:"Where can I buy alcohol?",a:"Light beer (folköl, max 3.5%) can be bought at 7-Eleven, Pressbyrån and supermarkets. But wine and anything stronger — beer above 3.5%, spirits — is ONLY sold at Systembolaget, the government-run store. Systembolaget is open weekdays until around 7-8pm, Saturdays until 3pm, and CLOSED on Sundays. Bars and restaurants serve all alcohol types until 1-3am depending on their license."},
     {q:"Is Stockholm safe?",a:"Yes — Stockholm is very safe. Normal city precautions apply. Watch for pickpockets in busy Gamla Stan tourist areas. The metro and streets are safe at night. Emergency number is 112."},
     {q:"Do I need to tip?",a:"No obligation at all. Service charge is included in Swedish prices by law. If you want to tip, simply round up the bill — that's perfectly appreciated. Never feel pressured to tip."},
     {q:"Does everyone speak English?",a:"Yes — virtually everyone in Stockholm speaks excellent English. You will have absolutely no language problems anywhere in the city, including in shops, restaurants, and public transport."},
@@ -745,7 +761,7 @@ function FAQ(){
     <div style={{display:"flex",gap:8,overflowX:"auto",marginBottom:20,paddingBottom:4}}>
       {[
         {emoji:"💳",text:"Cashless country"},
-        {emoji:"🚫",text:"No alcohol in shops"},
+        {emoji:"🍺",text:"Light beer only in shops"},
         {emoji:"🌊",text:"Safe tap water"},
         {emoji:"🇬🇧",text:"Everyone speaks English"},
         {emoji:"🚨",text:"Emergency: 112"},
@@ -783,6 +799,13 @@ function App(){
   const [chatInit,setChatInit]=useState("");
   const [large,setLarge]=useState(false);
   const [location,setLocation]=useState("");
+  const [dark,setDark]=useState(()=>{
+    const saved=localStorage.getItem("st_dark_mode");
+    if(saved!==null) return saved==="1";
+    const h=new Date().getHours();
+    return h>=20||h<6;
+  });
+  useEffect(()=>{localStorage.setItem("st_dark_mode",dark?"1":"0");},[dark]);
 
   useEffect(()=>{
     if(navigator.geolocation){
@@ -816,18 +839,19 @@ function App(){
     daytime:"Daytime Stockholm ☀️",nightlife:"Stockholm Nightlife 🌙",tours:"Book Experiences 🎟️",faq:"Good To Know 💡"
   };
 
-  return <div style={{fontFamily:"'DM Sans',sans-serif",background:"#F7F4EF",minHeight:"100vh",fontSize:large?"110%":"100%"}}>
+  return <div style={{fontFamily:"'DM Sans',sans-serif",background:dark?"#15212E":"#F7F4EF",minHeight:"100vh",fontSize:large?"110%":"100%",transition:"background 0.2s"}}>
 
     {/* Header for inner screens */}
-    {screen!=="home"&&<div style={{background:"#fff",padding:"14px 18px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #EAE4D8",position:"sticky",top:0,zIndex:10,boxShadow:"0 2px 16px rgba(0,0,0,0.07)"}}>
-      <button onClick={()=>setScreen("home")} style={{width:38,height:38,borderRadius:"50%",background:"#F7F4EF",border:"none",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>←</button>
-      <div className="serif" style={{fontSize:17,fontWeight:900,color:"#0D1B2A",flex:1}}>{titles[screen]}</div>
-      <button onClick={()=>setLarge(p=>!p)} style={{background:large?"#C9A84C":"#F7F4EF",border:"none",borderRadius:50,padding:"6px 12px",fontSize:12,fontWeight:700,cursor:"pointer",color:"#0D1B2A"}}>{large?"A-":"A+"}</button>
+    {screen!=="home"&&<div style={{background:dark?"#1C2A38":"#fff",padding:"14px 18px",display:"flex",alignItems:"center",gap:10,borderBottom:dark?"1px solid #2A3A4A":"1px solid #EAE4D8",position:"sticky",top:0,zIndex:10,boxShadow:"0 2px 16px rgba(0,0,0,0.07)"}}>
+      <button onClick={()=>setScreen("home")} style={{width:38,height:38,borderRadius:"50%",background:dark?"#15212E":"#F7F4EF",border:"none",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:dark?"#F0EBE0":"#0D1B2A"}}>←</button>
+      <div className="serif" style={{fontSize:17,fontWeight:900,color:dark?"#F0EBE0":"#0D1B2A",flex:1}}>{titles[screen]}</div>
+      <button onClick={()=>setDark(p=>!p)} aria-label="Toggle dark mode" style={{background:dark?"#C9A84C":"#F7F4EF",border:"none",borderRadius:50,width:34,height:34,fontSize:15,cursor:"pointer",color:"#0D1B2A",flexShrink:0}}>{dark?"☀️":"🌙"}</button>
+      <button onClick={()=>setLarge(p=>!p)} style={{background:large?"#C9A84C":dark?"#15212E":"#F7F4EF",border:"none",borderRadius:50,padding:"6px 12px",fontSize:12,fontWeight:700,cursor:"pointer",color:large?"#0D1B2A":dark?"#F0EBE0":"#0D1B2A",flexShrink:0}}>{large?"A-":"A+"}</button>
     </div>}
 
     {/* Screens */}
-    {screen==="home"&&<Home onNav={nav} location={location}/>}
-    {screen==="chat"&&<Chat key={chatInit} initMsg={chatInit} location={location}/>}
+    {screen==="home"&&<Home onNav={nav} location={location} dark={dark} setDark={setDark}/>}
+    {screen==="chat"&&<Chat key={chatInit} initMsg={chatInit} location={location} dark={dark}/>}
     {screen==="transport"&&<Transport/>}
     {screen==="food"&&<Food onNav={nav}/>}
     {screen==="todo"&&<ToDo onNav={nav}/>}
@@ -842,10 +866,10 @@ function App(){
     {screen==="nightlife"&&<Nightlife onNav={nav}/>}
 
     {/* Bottom Nav */}
-    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"#fff",borderTop:"1px solid #EAE4D8",display:"flex",padding:"8px 0 14px",boxShadow:"0 -4px 24px rgba(0,0,0,0.09)",zIndex:100}}>
+    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:dark?"#1C2A38":"#fff",borderTop:dark?"1px solid #2A3A4A":"1px solid #EAE4D8",display:"flex",padding:"8px 0 14px",boxShadow:"0 -4px 24px rgba(0,0,0,0.09)",zIndex:100}}>
       {navItems.map(item=><button key={item.id} onClick={()=>nav(item.id)} style={{flex:1,background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"5px 4px"}}>
         <span style={{fontSize:21,filter:screen===item.id?"none":"grayscale(0.5) opacity(0.55)",transition:"filter 0.15s"}}>{item.emoji}</span>
-        <span style={{fontSize:10,fontWeight:700,color:screen===item.id?"#0D1B2A":"#8A9BB0",letterSpacing:0.3,fontFamily:"'DM Sans',sans-serif"}}>{item.label}</span>
+        <span style={{fontSize:10,fontWeight:700,color:screen===item.id?(dark?"#F0EBE0":"#0D1B2A"):(dark?"#7E8FA0":"#8A9BB0"),letterSpacing:0.3,fontFamily:"'DM Sans',sans-serif"}}>{item.label}</span>
         {screen===item.id&&<div style={{width:18,height:3,background:"#C9A84C",borderRadius:2}}/>}
       </button>)}
     </div>
