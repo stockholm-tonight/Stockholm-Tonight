@@ -1,2 +1,1 @@
-[[plugins]]
-  package = "@netlify/plugin-prerender"
+# Prerender handled via Netlify Extensions
